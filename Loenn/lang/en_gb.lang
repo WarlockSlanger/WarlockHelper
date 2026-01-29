@@ -1,0 +1,12 @@
+# Dash Bumper
+entities.WarlockHelper/DashBumper.placements.name.normal=Dash Bumper
+entities.WarlockHelper/DashBumper.placements.name.red=Dash Bumper (Uh-Oh)
+entities.WarlockHelper/DashBumper.attributes.description.snapDirection=Whether to snap near-horizontal dash directions to horizontal
+
+# Sample Trigger
+triggers.WarlockHelper/SampleTrigger.placements.name.normal=Sample Trigger
+triggers.WarlockHelper/SampleTrigger.attributes.description.sampleProperty=A sample property for your trigger.
+
+# Sample Solid
+entities.WarlockHelper/SampleSolid.placements.name.normal=Sample Solid
+entities.WarlockHelper/SampleSolid.attributes.description.dashCollisionResult=So true.
