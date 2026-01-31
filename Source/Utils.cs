@@ -2,12 +2,21 @@
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
+using System.Reflection;
 
 namespace Celeste.Mod.WarlockHelper
 {
     public static class Utils
     {
-        internal const string wsh = "WarlockHelper";
+        internal static void Log(String message, LogLevel? logLevel = null, String specifier = null)
+        {
+            String tag = WarlockHelperModule.HelperName;
+            if (specifier != null)
+            {
+                tag += $"/{specifier}";
+            }
+            Logger.Log(logLevel ?? LogLevel.Verbose,tag,message);
+        }
 
         static public Vector2 BumperSnapDir(Vector2 dir, bool snapUp = true, bool sidesOnly = false)
         {

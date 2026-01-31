@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.Core.Platforms;
 using System;
+using System.Reflection;
 
 namespace Celeste.Mod.WarlockHelper.Components;
 
@@ -32,7 +33,8 @@ public class DashDirOverrider : Component
         }
     }
     public DashListener dashlistener;
-    public void Set(Vector2? dashdir, int? count = 1, float? duration = null) {
+    public void Set(Vector2? dashdir, int? count = 1, float? duration = null)
+    {
         DashDir = dashdir;
         Count = count;
         Duration = duration;
@@ -62,13 +64,12 @@ public class DashDirOverrider : Component
     public void OnDash(Vector2 dir)
     {
         Count--;
-        Logger.Log("WarlockHelper/ondasg",$"dashed count to {Count}...");
+        Utils.Log($"dashed count to {Count}... because of dashlistener {Debug.ComponentIds[dashlistener]} for ddor {Debug.ComponentIds[this]}",LogLevel.Debug,nameof(DashDirOverrider));
     }
-    public override void DebugRender(Camera camera)
+    
+    internal static void Player_OnSpawn(Player player)
     {
-        base.DebugRender(camera);
-        //Draw.Text(Draw.DefaultFont,$"{Count}");
+        player.Add(new DashDirOverrider());
     }
-
     
 }
