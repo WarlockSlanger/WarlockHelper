@@ -1,12 +1,11 @@
 # Dash Bumper
 entities.WarlockHelper/DashBumper.placements.name.normal=Dash Bumper
-entities.WarlockHelper/DashBumper.placements.name.red=Dash Bumper (Uh-Oh)
-entities.WarlockHelper/DashBumper.attributes.description.snapDirection=Whether to snap near-horizontal dash directions to horizontal
+entities.WarlockHelper/DashBumper.placements.description.normal=Bumper that makes you dash in the direction it is hit.
+entities.WarlockHelper/DashBumper.placements.name.red=Dash Bumper (Red)
+entities.WarlockHelper/DashBumper.placements.description.red=Bumper that causes a red booster-style dash in the direction it is hit.
+entities.WarlockHelper/DashBumper.attributes.description.snapDirection=Whether to snap 360-degree dash directions to the 8 normal directions.
 
-# Sample Trigger
-triggers.WarlockHelper/SampleTrigger.placements.name.normal=Sample Trigger
-triggers.WarlockHelper/SampleTrigger.attributes.description.sampleProperty=A sample property for your trigger.
-
-# Sample Solid
-entities.WarlockHelper/SampleSolid.placements.name.normal=Sample Solid
-entities.WarlockHelper/SampleSolid.attributes.description.dashCollisionResult=So true.
+# Dash Direction Controller
+entities.WarlockHelper/DashDirController.placements.name.normal=Dash Direction Controller
+entities.WarlockHelper/DashDirController.placements.description.normal=Controller which alters the direction of the player's dash.
+entities.WarlockHelper/DashDirController.attributes.description.angle=Rotates the player's dash by the specified angle.

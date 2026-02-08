@@ -10,19 +10,33 @@ public static class Debug
     public static componentIds ComponentIds = new componentIds(); 
     public class componentIds
     {
-        private static Dictionary<Component, int> _ids = new Dictionary<Component, int>();
+        private Dictionary<Component, int> _ids = new();
+        private Dictionary<int, Component> _components = new();
         private static int _currentId = 0;
 
-        public  int this[Component i]
+        public  int? this[Component i]
         {
             get
             {
-                if (!_ids.TryGetValue(i, out int value))
+                if (i == null)
                 {
-                    value = _currentId++;
-                    _ids.Add(i, value);
+                    return null;
                 }
+
+                if (_ids.TryGetValue(i, out int value)) return value;
+                value = _currentId++;
+                _ids.Add(i, value);
+                _components.Add(value, i);
                 return value;
+            }
+        }
+
+        public Component this[int i]
+        {
+            get
+            {
+                _components.TryGetValue(i,out var component);
+                return component;
             }
         }
     }
