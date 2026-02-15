@@ -12,14 +12,7 @@ public static class Extensions
     public static void ForceDash(this Player player, Vector2? dashdir = null, bool red = false)
     {
         SetNextDashDir(player,dashdir);
-        if (red)
-        {
-            player.StateMachine.ForceState(5);
-        }
-        else
-        {
-            player.StateMachine.ForceState(2);
-        }
+        player.StateMachine.ForceState(red ? Player.StRedDash : Player.StDash);
     }
 
     public static DashDirOverrider GetDashDirOverrider(this Player player)
@@ -37,7 +30,7 @@ public static class Extensions
     {
         DashDirOverrider ddr = player.GetDashDirOverrider();
         ddr.SetCurrent(dashdir);
-        Utils.Log(
+        Debug.Log(
             $"Forcing next Player dash direction to {dashdir}",LogLevel.Verbose,"SetNextDashDir");
     }
 
@@ -45,7 +38,7 @@ public static class Extensions
     {
         DashDirOverrider ddr = player.GetDashDirOverrider();
         ddr.SetDefault(dashdirfunc);
-        Utils.Log(
+        Debug.Log(
             $"Setting default Player dash direction to {dashdirfunc}",LogLevel.Verbose,"SetDefaultDashDir");
     }
 }

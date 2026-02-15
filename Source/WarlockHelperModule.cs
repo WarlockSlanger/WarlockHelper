@@ -35,30 +35,14 @@ public class WarlockHelperModule : EverestModule {
         Logger.SetLogLevel(HelperName, LogLevel.Info);
 #endif
     }
-    ILHook dashCoroutineHook,redDashCoroutineHook;
 
-    public override void Load() {
-        dashCoroutineHook = new ILHook(typeof(Player).GetMethod("DashCoroutine", BindingFlags.NonPublic | BindingFlags.Instance).GetStateMachineTarget(), Player_redirDash);
-        redDashCoroutineHook = new ILHook(typeof(Player).GetMethod("RedDashCoroutine", BindingFlags.NonPublic | BindingFlags.Instance).GetStateMachineTarget(), Player_redirDash);
-        Everest.Events.Player.OnSpawn += DashDirOverrider.player_OnSpawn;
+    public override void Load()
+    {
+        DashDirOverrider.Load();
     }
 
     public override void Unload()
     {
-        dashCoroutineHook.Dispose();
-        dashCoroutineHook = null;
-        redDashCoroutineHook.Dispose();
-        redDashCoroutineHook = null;
-        Everest.Events.Player.OnSpawn -= DashDirOverrider.player_OnSpawn;
-    }
-    private static void Player_redirDash (ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-        Utils.Log($"Overwriting lastAim in CIL code for {cursor.Method.FullName}", LogLevel.Debug, "Player_redirDash");
-        while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Player>("lastAim")))
-        {
-            cursor.Emit(OpCodes.Ldloc_1);
-            cursor.EmitDelegate(DashDirOverrider.playerGetDashDir);
-        }
+        DashDirOverrider.Unload();
     }
 }

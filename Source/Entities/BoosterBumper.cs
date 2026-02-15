@@ -5,17 +5,46 @@ using System;
 
 namespace Celeste.Mod.WarlockHelper.Entities;
 
-[CustomEntity("WarlockHelper/DashBumper")]
-public class DashBumper : Entity 
+[CustomEntity("WarlockHelper/BoosterBumper")]
+public class BoosterBumper : Entity
 {
-    public ParticleType P_Ambience = Bumper.P_Ambience;
-    public ParticleType P_Launch = Bumper.P_Launch;
-    public Sprite sprite;
-    public VertexLight light;
-    public BloomPoint bloom;
+    public static ParticleType P_Ambience = new ParticleType
+    {
+        Source = GFX.Game["particles/rect"],
+        Color = Calc.HexToColor("ff8fc8"),
+        Color2 = Calc.HexToColor("cc3d7f"),
+        ColorMode = ParticleType.ColorModes.Blink,
+        FadeMode = ParticleType.FadeModes.InAndOut,
+        Size = 0.5f,
+        SizeRange = 0.2f,
+        RotationMode = ParticleType.RotationModes.SameAsDirection,
+        LifeMin = 0.2f,
+        LifeMax = 0.4f,
+        SpeedMin = 10f,
+        SpeedMax = 20f,
+        DirectionRange = MathF.PI / 6f
+    };
+    public static ParticleType P_Launch = new ParticleType
+    {
+        Source = GFX.Game["particles/rect"],
+        Color = Calc.HexToColor("ff8fc8"),
+        Color2 = Calc.HexToColor("cc3d7f"),
+        ColorMode = ParticleType.ColorModes.Blink,
+        FadeMode = ParticleType.FadeModes.Late,
+        Size = 0.5f,
+        SizeRange = 0.2f,
+        RotationMode = ParticleType.RotationModes.Random,
+        LifeMin = 0.6f,
+        LifeMax = 1.2f,
+        SpeedMin = 40f,
+        SpeedMax = 140f,
+        SpeedMultiplier = 0.1f,
+        Acceleration = new Vector2(0f, 10f),
+        DirectionRange = 0.6981317f
+    };
+    
     public Vector2? node;
     public Vector2 anchor;
-    public SineWave sine;
     public float respawnTimer;
 
     public float RespawnTime;
@@ -23,17 +52,33 @@ public class DashBumper : Entity
     public bool Wobbling;
     public bool SnapDirection;
     
-    private float MoveCycleTime;
-    private float SineCycleFreq;
-    private float DashSpeed;
+    public float MoveCycleTime;
+    public float WobbleRate;
+    public float WobbleStrength;
+    public float DashSpeed;
     
-    public DashBumper(EntityData data, Vector2 offset)
+    private Sprite Sprite;
+    private VertexLight light;
+    private BloomPoint bloom;
+    private SineWave sine;
+    
+    public BoosterBumper(EntityData data, Vector2 offset)
         : base(data.Position+offset)
     {
+        //todo replace scalar DashSpeed with Matrix2x2 
+        Red = data.Bool("red");
+        Wobbling = data.Bool("wobbling");
+        SnapDirection = data.Bool("snapDirection");
+        RespawnTime = data.Float("respawnTime",0.6f);
+        MoveCycleTime = data.Float("moveCycleTime",1.8181819f);
+        WobbleRate = data.Float("wobbleRate",0.44f);
+        WobbleStrength = data.Float("wobbleStrength", 1f);
+        DashSpeed = data.Float("dashSpeed",1f);
+        
         Collider = new Circle(12f);
         Add(new PlayerCollider(OnPlayer));
-        Add(sine = new SineWave(SineCycleFreq, 0f).Randomize());
-        Add(sprite = GFX.SpriteBank.Create("bumper"));
+        Add(sine = new SineWave(WobbleRate, 0f).Randomize());
+        Add(Sprite = GFX.SpriteBank.Create(Red ? "warlockHelper_boosterBumper_red" : "warlockHelper_boosterBumper"));
         Add(light = new VertexLight(Color.Teal, 1f, 16, 32));
         Add(bloom = new BloomPoint(0.5f, 16f));
         node = data.FirstNodeNullable(offset);anchor = Position;
@@ -49,22 +94,15 @@ public class DashBumper : Entity
             Add(tween);
         }
         UpdatePosition();
-        Red = data.Bool("red");
-        Wobbling = data.Bool("wobbling");
-        SnapDirection = data.Bool("snapDirection");
-        RespawnTime = data.Float("respawnTime",0.6f);
-        MoveCycleTime = data.Float("moveCycleTime",1.8181819f);
-        SineCycleFreq = data.Float("sineCycleFreq",0.44f);
-        DashSpeed = data.Float("dashSpeed",240f);
-        DashSpeed /= 240f;
     }
-    private void UpdatePosition()
+    public void UpdatePosition()
     {
         if (!Wobbling)
         {
             Position = anchor;
+            return;
         }
-        Position = anchor + new Vector2(sine.Value * 3.0f, sine.ValueOverTwo * 2.0f);
+        Position = anchor + new Vector2(sine.Value * 3.0f, sine.ValueOverTwo * 2.0f) * WobbleStrength;
     }
     public override void Update()
     {
@@ -76,7 +114,7 @@ public class DashBumper : Entity
             {
                 light.Visible = true;
                 bloom.Visible = true;
-                sprite.Play("on");
+                Sprite.Play("on");
                 Audio.Play("event:/game/06_reflection/pinballbumper_reset", Position);
             }
         }
@@ -110,7 +148,7 @@ public class DashBumper : Entity
                 player.RefillDash();
             }
             player.RefillStamina();
-            sprite.Play("hit", restart: true);
+            Sprite.Play("hit", restart: true);
             light.Visible = false;
             bloom.Visible = false;
             SceneAs<Level>().DirectionalShake(dir, 0.15f);

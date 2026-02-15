@@ -1,11 +1,14 @@
-# Dash Bumper
-entities.WarlockHelper/DashBumper.placements.name.normal=Dash Bumper
-entities.WarlockHelper/DashBumper.placements.description.normal=Bumper that makes you dash in the direction it is hit.
-entities.WarlockHelper/DashBumper.placements.name.red=Dash Bumper (Red)
-entities.WarlockHelper/DashBumper.placements.description.red=Bumper that causes a red booster-style dash in the direction it is hit.
-entities.WarlockHelper/DashBumper.attributes.description.snapDirection=Whether to snap 360-degree dash directions to the 8 normal directions.
+# Booster Bumper
+entities.WarlockHelper/BoosterBumper.placements.name.normal=Booster Bumper
+entities.WarlockHelper/BoosterBumper.placements.description.normal=Bumper that makes you dash in the direction it is hit.
+entities.WarlockHelper/BoosterBumper.placements.name.red=Booster Bumper (Red)
+entities.WarlockHelper/BoosterBumper.placements.description.red=Bumper that causes a red booster-style dash in the direction it is hit.
+entities.WarlockHelper/BoosterBumper.attributes.description.snapDirection=Whether to snap 360-degree dash directions to the 8 normal directions.
 
 # Dash Direction Controller
 entities.WarlockHelper/DashDirController.placements.name.normal=Dash Direction Controller
-entities.WarlockHelper/DashDirController.placements.description.normal=Controller which alters the direction of the player's dash.
-entities.WarlockHelper/DashDirController.attributes.description.angle=Rotates the player's dash by the specified angle.
+entities.WarlockHelper/DashDirController.placements.description.normal=Controller which alters the direction and speed of the player's dash.
+entities.WarlockHelper/DashDirController.attributes.description.a=Top-left matrix element (how much of the original X coordinate to add to the new X coordinate).
+entities.WarlockHelper/DashDirController.attributes.description.b=Top-right matrix element (how much of the original Y coordinate to add to the new X coordinate).
+entities.WarlockHelper/DashDirController.attributes.description.c=Bottom-left matrix element (how much of the original X coordinate to add to the new Y coordinate).
+entities.WarlockHelper/DashDirController.attributes.description.d=Bottom-right matrix element (how much of the original Y coordinate to add to the new Y coordinate).

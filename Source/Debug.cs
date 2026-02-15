@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
@@ -5,8 +6,17 @@ using Monocle;
 
 namespace Celeste.Mod.WarlockHelper;
 
-public static class Debug
+internal static class Debug
 {
+    internal static void Log(String message, LogLevel logLevel = LogLevel.Verbose, String specifier = null)
+    {
+        String tag = WarlockHelperModule.HelperName;
+        if (specifier != null)
+        {
+            tag += $"/{specifier}";
+        }
+        Logger.Log(logLevel,tag,message);
+    }
     public static componentIds ComponentIds = new componentIds(); 
     public class componentIds
     {

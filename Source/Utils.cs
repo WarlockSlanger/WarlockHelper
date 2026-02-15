@@ -9,16 +9,20 @@ namespace Celeste.Mod.WarlockHelper
 {
     public static class Utils
     {
-        internal static void Log(String message, LogLevel logLevel = LogLevel.Verbose, String specifier = null)
+        public struct Matrix2x2
         {
-            String tag = WarlockHelperModule.HelperName;
-            if (specifier != null)
-            {
-                tag += $"/{specifier}";
-            }
-            Logger.Log(logLevel,tag,message);
-        }
+            public float A,B,C,D;
 
+            public Matrix2x2(float a, float b, float c, float d)
+            {
+                A = a; B = b;
+                C = c; D = d;
+            }
+        }
+        public static Vector2 Transform(this Vector2 vector, Matrix2x2 matrix)
+        {
+            return new Vector2(vector.X*matrix.A + vector.Y*matrix.B, vector.X*matrix.C + vector.Y*matrix.D);
+        }
         public static Vector2 BumperSnapDir(Vector2 dir, bool snapUp = true, bool sidesOnly = false)
         {
             dir = dir.SafeNormalize(-Vector2.UnitY);
