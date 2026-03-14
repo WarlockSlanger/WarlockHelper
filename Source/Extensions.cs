@@ -1,44 +1,97 @@
-using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
-using MonoMod.Core.Platforms;
 using System;
 using Celeste.Mod.WarlockHelper.Components;
 
 namespace Celeste.Mod.WarlockHelper;
 
-public static class Extensions
+internal static class Extensions
 {
-    public static void ForceDash(this Player player, Vector2? dashdir = null, bool red = false)
+    extension(EntityData data)
     {
-        SetNextDashDir(player,dashdir);
-        player.StateMachine.ForceState(red ? Player.StRedDash : Player.StDash);
-    }
-
-    public static DashDirOverrider GetDashDirOverrider(this Player player)
-    {
-        DashDirOverrider ddr = player.Get<DashDirOverrider>();
-        if (ddr == null)
+        public string[] AttrArray(string key, int? size = null, string[] defaultValue = null)
         {
-            ddr = new DashDirOverrider();
-            player.Add(ddr);
+            object obj;
+            if (data.Values == null || !data.Values.TryGetValue(key, out obj))
+            {
+                Debug.Log($"Value {key} not found in {data.Name} {data.ID}", LogLevel.Warn, "AttrArray");
+                return defaultValue;
+            }
+
+            string valueString = obj.ToString();
+            string[] value = valueString.Split(',');
+            if (size!=null && value.Length != size)
+            {
+                throw new FormatException($"Comma-separated array of size {size} required for value {key} of {data.Name} {data.ID}, received {valueString}");
+            }
+            return value;
         }
-        return ddr;
+
+        public int[] IntArray(string key, int? size = null, int[] defaultValue = null)
+        {
+            string[] attrArray = data.AttrArray(key, size);
+            return attrArray == null ? defaultValue : Array.ConvertAll(attrArray,int.Parse);
+        }
+
+        public float[] FloatArray(string key, int? size = null, float[] defaultValue = null)
+        {
+            string[] attrArray = data.AttrArray(key, size);
+            return attrArray == null ? defaultValue : Array.ConvertAll(attrArray,float.Parse);
+        }
+
+        public Vector2 Vector2(string key, Vector2 defaultValue = default)
+        {
+            float[] arrayVector = data.FloatArray(key, 2);
+            return arrayVector == null ? defaultValue : new Vector2(arrayVector[0],arrayVector[1]);
+        }
     }
 
-    public static void SetNextDashDir(this Player player, Vector2? dashdir = null)
+    extension(Vector2 vector)
     {
-        DashDirOverrider ddr = player.GetDashDirOverrider();
-        ddr.SetCurrent(dashdir);
-        Debug.Log(
-            $"Forcing next Player dash direction to {dashdir}",LogLevel.Verbose,"SetNextDashDir");
+        public Vector2 Transform(Utils.Matrix2x2 matrix)
+        {
+            return new Vector2(vector.X*matrix.A + vector.Y*matrix.B + matrix.X, vector.X*matrix.C + vector.Y*matrix.D + matrix.Y);
+        }
+
+        public int Angle8()
+        {
+            return ((int)Math.Round(vector.Angle() * 4 / Math.PI)+8)%8;
+        }
     }
 
-    public static void SetDefaultDashDir(this Player player, Func<Vector2?> dashdirfunc)
+    extension(Player player)
     {
-        DashDirOverrider ddr = player.GetDashDirOverrider();
-        ddr.SetDefault(dashdirfunc);
-        Debug.Log(
-            $"Setting default Player dash direction to {dashdirfunc}",LogLevel.Verbose,"SetDefaultDashDir");
+        public void ForceDash(Vector2? dashdir = null, bool red = false)
+        {
+            SetNextDashDir(player,dashdir);
+            player.StateMachine.ForceState(red ? Player.StRedDash : Player.StDash);
+        }
+
+        internal DashDirOverrider GetDashDirOverrider()
+        {
+            DashDirOverrider ddr = player.Get<DashDirOverrider>();
+            if (ddr == null)
+            {
+                ddr = new DashDirOverrider();
+                player.Add(ddr);
+            }
+            return ddr;
+        }
+
+        public void SetNextDashDir(Vector2? dashdir = null)
+        {
+            DashDirOverrider ddr = player.GetDashDirOverrider();
+            ddr.SetCurrent(dashdir);
+            Debug.Log(
+                $"Forcing next Player dash direction to {dashdir}",LogLevel.Verbose,"SetNextDashDir");
+        }
+
+        public void SetDefaultDashDir(Func<Player,Vector2> dashdirfunc)
+        {
+            DashDirOverrider ddr = player.GetDashDirOverrider();
+            ddr.SetDefault(dashdirfunc);
+            Debug.Log(
+                $"Setting default Player dash direction to {dashdirfunc}",LogLevel.Verbose,"SetDefaultDashDir");
+        }
     }
 }

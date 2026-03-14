@@ -2,6 +2,7 @@ using System;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
+using static Celeste.Mod.WarlockHelper.Utils.Dir8;
 
 namespace Celeste.Mod.WarlockHelper.Entities;
 
@@ -10,23 +11,64 @@ namespace Celeste.Mod.WarlockHelper.Entities;
 
 public class DashDirController : Entity
 {
-    private Utils.Matrix2x2 Matrix;
-    public Func<Vector2?> DashDirFunc;
-
-    private Player player;
-    public DashDirController(EntityData data, Vector2 _) : base()
+    public Func<Player,Vector2> DashDirFunc;
+    public bool OverrideNeutral;
+    
+    private Player Player;
+    public DashDirController(EntityData data, Vector2 _)
     {
-        Matrix = new Utils.Matrix2x2(data.Float("a"), data.Float("b"), data.Float("c"), data.Float("d"));
-        DashDirFunc = (() => Input.GetAimVector().Transform(Matrix));
+        OverrideNeutral = data.Bool("overrideNeutral");
+        Vector2 neutralLeft = data.Vector2("neutralLeft"), neutralRight=data.Vector2("neutralRight");
+        if (data.Has("direction"))
+        {
+            Utils.Matrix2x2 matrix = new(data.FloatArray("direction"));
+            DashDirFunc = ((Player player) =>
+            {
+                if (OverrideNeutral || Input.Aim.Value == Vector2.Zero)
+                {
+                    return player.Facing == Facings.Left ? neutralLeft:neutralRight;
+                }
+                return Input.GetAimVector(player.Facing).Transform(matrix);
+            });
+            
+        }
+        else
+        {
+            Vector2[] dirs =
+            {
+                data.Vector2("right",RIGHT),
+                data.Vector2("downRight",DOWNRIGHT),
+                data.Vector2("down",DOWN),
+                data.Vector2("downLeft",DOWNLEFT),
+                data.Vector2("left",LEFT),
+                data.Vector2("upLeft",UPLEFT),
+                data.Vector2("up",UP),
+                data.Vector2("upRight",UPRIGHT),
+            };
+            DashDirFunc = ((Player player) =>
+            {
+                if (OverrideNeutral || Input.Aim.Value == Vector2.Zero)
+                {
+                    return player.Facing == Facings.Left ? neutralLeft:neutralRight;
+                }
+                int angle = Input.GetAimVector(player.Facing).Angle8();
+                return dirs[angle];
+            });
+        }
+    }
+
+    public DashDirController(Func<Player, Vector2> dashDirFunc)
+    {
+        DashDirFunc = dashDirFunc;
     }
 
     public override void Awake(Scene scene)
     {
         base.Awake(scene);
-        player = scene.Tracker.GetEntity<Player>();
-        player.SetDefaultDashDir(DashDirFunc);
+        Player = scene.Tracker.GetEntity<Player>();
+        Player.SetDefaultDashDir(DashDirFunc);
         Debug.Log(
-            $"Dash Direction Controller from room {this.SourceData.Level.Name} activated",LogLevel.Verbose,"DashDirController.Removed");
+            $"Dash Direction Controller from room {SourceData.Level.Name} activated",LogLevel.Verbose,"DashDirController.Removed");
     }
 
     public override void Removed(Scene scene)
@@ -36,12 +78,12 @@ public class DashDirController : Entity
         {
             if (entity != this)
             {
-                return;
+                return; //reset dashDirection only if there aren't any other controllers
             }
         }
-        player.SetDefaultDashDir(null);
+        Player.SetDefaultDashDir(null);
         Debug.Log(
-            $"Dash Direction Controller from room {this.SourceData.Level.Name} inactivated", LogLevel.Verbose,
+            $"Dash Direction Controller from room {SourceData.Level.Name} deactivated", LogLevel.Verbose,
             "DashDirController.Removed");
     }
 }

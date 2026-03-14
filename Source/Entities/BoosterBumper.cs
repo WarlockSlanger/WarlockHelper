@@ -8,7 +8,7 @@ namespace Celeste.Mod.WarlockHelper.Entities;
 [CustomEntity("WarlockHelper/BoosterBumper")]
 public class BoosterBumper : Entity
 {
-    public static ParticleType P_Ambience = new ParticleType
+    private static readonly ParticleType P_Ambience = new ParticleType
     {
         Source = GFX.Game["particles/rect"],
         Color = Calc.HexToColor("ff8fc8"),
@@ -24,7 +24,8 @@ public class BoosterBumper : Entity
         SpeedMax = 20f,
         DirectionRange = MathF.PI / 6f
     };
-    public static ParticleType P_Launch = new ParticleType
+
+    private static readonly ParticleType P_Launch = new ParticleType
     {
         Source = GFX.Game["particles/rect"],
         Color = Calc.HexToColor("ff8fc8"),
@@ -44,7 +45,7 @@ public class BoosterBumper : Entity
     };
     
     public Vector2? node;
-    public Vector2 anchor;
+    private Vector2 anchor;
     public float respawnTimer;
 
     public float RespawnTime;
@@ -55,7 +56,7 @@ public class BoosterBumper : Entity
     public float MoveCycleTime;
     public float WobbleRate;
     public float WobbleStrength;
-    public float DashSpeed;
+    public Func<Vector2,Vector2> DashDirFunc;
     
     private Sprite Sprite;
     private VertexLight light;
@@ -65,7 +66,6 @@ public class BoosterBumper : Entity
     public BoosterBumper(EntityData data, Vector2 offset)
         : base(data.Position+offset)
     {
-        //todo replace scalar DashSpeed with Matrix2x2 
         Red = data.Bool("red");
         Wobbling = data.Bool("wobbling");
         SnapDirection = data.Bool("snapDirection");
@@ -73,7 +73,8 @@ public class BoosterBumper : Entity
         MoveCycleTime = data.Float("moveCycleTime",1.8181819f);
         WobbleRate = data.Float("wobbleRate",0.44f);
         WobbleStrength = data.Float("wobbleStrength", 1f);
-        DashSpeed = data.Float("dashSpeed",1f);
+        var matrix = new Utils.Matrix2x2(data.FloatArray("direction"));
+        DashDirFunc = (dir => dir.Transform(matrix));
         
         Collider = new Circle(12f);
         Add(new PlayerCollider(OnPlayer));
@@ -87,7 +88,7 @@ public class BoosterBumper : Entity
             Vector2 start = Position;
             Vector2 end = node.Value;
             Tween tween = Tween.Create(Tween.TweenMode.YoyoLooping, Ease.CubeInOut, MoveCycleTime, start: true);
-            tween.OnUpdate = (Tween t) =>
+            tween.OnUpdate = t =>
             {
                 anchor = Vector2.Lerp(start, end, t.Eased);
             };
@@ -139,9 +140,11 @@ public class BoosterBumper : Entity
             Vector2 dir = (player.Center - Center).SafeNormalize(Vector2.UnitY);
             if (SnapDirection)
             {
-                dir = Utils.DashDirSnap(dir);
+                dir = dir.EightWayNormal();
             }
-            player.ForceDash(DashSpeed*dir, Red);
+
+            dir = DashDirFunc(dir);
+            player.ForceDash(dir, Red);
             if(!player.Inventory.NoRefills)
 
             {
@@ -153,7 +156,7 @@ public class BoosterBumper : Entity
             bloom.Visible = false;
             SceneAs<Level>().DirectionalShake(dir, 0.15f);
             SceneAs<Level>().Displacement.AddBurst(Center, 0.3f, 8f, 32f, 0.8f);
-            SceneAs<Level>().Particles.Emit(P_Launch, 12, base.Center + dir * 12f, Vector2.One * 3f, dir.Angle());
+            SceneAs<Level>().Particles.Emit(P_Launch, 12, Center + dir * 12f, Vector2.One * 3f, dir.Angle());
         }
     }
 }
