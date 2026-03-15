@@ -32,7 +32,6 @@ public class DashDirOverrider : Component
             return Input.GetAimVector(((Player)Entity).Facing);
         }
     }
-    private DashListener dashlistener;
     public void SetCurrent(Vector2? dashDir)
     {
         altDashDir = dashDir;
@@ -43,21 +42,10 @@ public class DashDirOverrider : Component
     }
 
     public DashDirOverrider() : base(active: true, visible: false) {
-        dashlistener = new DashListener(OnDash);
         defaultDashDir = null;
         altDashDir = null;
     }
-    public override void Added(Entity entity)
-    {
-        base.Added(entity);
-        entity.Add(dashlistener);
-    }
-    public override void Removed(Entity entity)
-    {
-        base.Removed(entity);
-        entity.Remove(dashlistener);
-    }
-    private void OnDash(Vector2 dir)
+    internal void OnDash()
     {
         SetCurrent(null);
     }
@@ -88,7 +76,7 @@ public class DashDirOverrider : Component
         Debug.Log($"Overwriting lastAim in CIL code for {cursor.Method.FullName}", LogLevel.Debug, "Player_redirDash");
         while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Player>("lastAim")))
         {
-            cursor.Emit(OpCodes.Ldloc_1);
+            cursor.EmitLdloc1();
             cursor.EmitDelegate(playerGetDashDir);
         }
     }

@@ -7,6 +7,20 @@ namespace Celeste.Mod.WarlockHelper;
 
 internal static class Extensions
 {
+    extension(Entity entity)
+    {
+        public T GetSafe<T>() where T : Component, new()
+        {
+            T comp = entity.Get<T>();
+            if (comp == null)
+            {
+                comp = new T();
+                entity.Add(comp);
+            }
+            return comp;
+        }
+
+    }
     extension(EntityData data)
     {
         public string[] AttrArray(string key, int? size = null, string[] defaultValue = null)
@@ -67,20 +81,9 @@ internal static class Extensions
             player.StateMachine.ForceState(red ? Player.StRedDash : Player.StDash);
         }
 
-        internal DashDirOverrider GetDashDirOverrider()
-        {
-            DashDirOverrider ddr = player.Get<DashDirOverrider>();
-            if (ddr == null)
-            {
-                ddr = new DashDirOverrider();
-                player.Add(ddr);
-            }
-            return ddr;
-        }
-
         public void SetNextDashDir(Vector2? dashdir = null)
         {
-            DashDirOverrider ddr = player.GetDashDirOverrider();
+            DashDirOverrider ddr = player.GetSafe<DashDirOverrider>();
             ddr.SetCurrent(dashdir);
             Debug.Log(
                 $"Forcing next Player dash direction to {dashdir}",LogLevel.Verbose,"SetNextDashDir");
@@ -88,7 +91,7 @@ internal static class Extensions
 
         public void SetDefaultDashDir(Func<Player,Vector2> dashdirfunc)
         {
-            DashDirOverrider ddr = player.GetDashDirOverrider();
+            DashDirOverrider ddr = player.GetSafe<DashDirOverrider>();
             ddr.SetDefault(dashdirfunc);
             Debug.Log(
                 $"Setting default Player dash direction to {dashdirfunc}",LogLevel.Verbose,"SetDefaultDashDir");
