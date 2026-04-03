@@ -17,48 +17,51 @@ namespace Celeste.Mod.WarlockHelper
             public static readonly Vector2 UP = -Vector2.UnitY;
             public static readonly Vector2 UPRIGHT = (-Vector2.UnitY).Rotate((float)Math.PI / 4f);
 
-            public static readonly Vector2[] DIRS = [RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT, UPLEFT, UP, UPRIGHT];
+            public static readonly Vector2[] DIRS = [RIGHT, UPRIGHT, UP, UPLEFT, LEFT, DOWNLEFT, DOWN, DOWNRIGHT];
         }
+
         public class Matrix2x2
         {
-            public float A,B,C,D,X,Y;
+            public float A, B, C, D, X, Y;
 
-            public Matrix2x2(float a=1f, float b=0f, float c=0f, float d=1f,float x=0f, float y=0f)
+            public Matrix2x2(float a = 1f, float b = 0f, float c = 0f, float d = 1f, float x = 0f, float y = 0f)
             {
-                A = a; B = b;
-                C = c; D = d;
-                X = x; Y = y;
+                A = a;
+                B = b;
+                C = c;
+                D = d;
+                X = x;
+                Y = y;
             }
+
             public Matrix2x2(float[] arr)
             {
                 switch (arr.Length)
                 {
-                    case 4:
+                    case 6:
                     {
                         A = arr[0];
                         B = arr[1];
                         C = arr[2];
                         D = arr[3];
-                        break;
-                    }
-                    case 6:
-                    {
-                        A = arr[0]; B = arr[1];
-                        C = arr[2]; D = arr[3];
-                        X = arr[4]; Y = arr[5];
+                        X = arr[4];
+                        Y = arr[5];
                         break;
                     }
                     default:
                     {
-                        Debug.Log($"Matrix should have size 4 or 6, received {string.Join(',',arr)}", LogLevel.Error, "Matrix2x2");
-                        A = 1f; B = 0f;
-                        C = 0f; D = 1f;
-                        X = 0f; Y = 0f;
+                        A = 1f;
+                        B = 0f;
+                        C = 0f;
+                        D = 1f;
+                        X = 0f;
+                        Y = 0f;
                         break;
                     }
                 }
             }
         }
+
         public static Vector2 BumperSnapDir(Vector2 dir, bool snapUp = true, bool sidesOnly = false)
         {
             dir = dir.SafeNormalize(-Vector2.UnitY);
@@ -68,7 +71,7 @@ namespace Celeste.Mod.WarlockHelper
                 dir.X = 0f;
                 dir.Y = -1f;
             }
-            else if (num <= 0.65f && num >= -0.55f)
+            else if (num is <= 0.65f and >= -0.55f)
             {
                 dir.Y = 0f;
                 dir.X = Math.Sign(dir.X);
@@ -79,7 +82,25 @@ namespace Celeste.Mod.WarlockHelper
                 dir.Y = 0f;
                 dir.X = Math.Sign(dir.X);
             }
+
             return dir;
+        }
+
+        public delegate bool TryConverter<in TInput,TOutput>(TInput input, out TOutput output);
+
+        public static bool TryConvertAll<TInput, TOutput>(TInput[] inputs, out TOutput[] outputs, TryConverter<TInput, TOutput> converter)
+        {
+            int size = inputs.Length;
+            outputs = new TOutput[size];
+            for (int i = 0; i < size; i++)
+            {
+                if (!converter(inputs[i], out outputs[i]))
+                {
+                    outputs = null;
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

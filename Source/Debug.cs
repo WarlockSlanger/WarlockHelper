@@ -6,23 +6,25 @@ namespace Celeste.Mod.WarlockHelper;
 
 internal static class Debug
 {
-    internal static void Log(String message, LogLevel logLevel = LogLevel.Verbose, String specifier = null)
+    internal static void Log(String message = null, LogLevel logLevel = LogLevel.Verbose, String specifier = null)
     {
         String tag = WarlockHelperModule.HelperName;
         if (specifier != null)
         {
             tag += $"/{specifier}";
         }
+
+        message ??= "";
         Logger.Log(logLevel,tag,message);
     }
-    public static componentIds ComponentIds = new componentIds(); 
+    public static componentIds ComponentIds = new(); 
     public class componentIds
     {
         private Dictionary<Component, int> _ids = new();
         private Dictionary<int, Component> _components = new();
-        private static int _currentId = 0;
+        private static int _currentId;
 
-        public  int? this[Component i]
+        public int? this[Component i]
         {
             get
             {

@@ -23,39 +23,35 @@ internal static class Extensions
     }
     extension(EntityData data)
     {
-        public string[] AttrArray(string key, int? size = null, string[] defaultValue = null)
+        private string[] AttrArray(string key, int? minSize = null, int? maxSize=null, string[] defaultValue = null)
         {
-            object obj;
-            if (data.Values == null || !data.Values.TryGetValue(key, out obj))
+            if (data.Values == null || !data.Values.TryGetValue(key, out var obj) || obj is not string)
             {
-                Debug.Log($"Value {key} not found in {data.Name} {data.ID}", LogLevel.Warn, "AttrArray");
+                Debug.Log($"String \"{key}\" not found in {data.Name} with ID {data.ID}", LogLevel.Warn, "StrArray");
                 return defaultValue;
             }
-
             string valueString = obj.ToString();
-            string[] value = valueString.Split(',');
-            if (size!=null && value.Length != size)
+            string[] value = valueString!.Split(',');
+            if ((minSize!=null && value.Length<minSize) || (maxSize!=null && value.Length > maxSize))
             {
-                throw new FormatException($"Comma-separated array of size {size} required for value {key} of {data.Name} {data.ID}, received {valueString}");
+                Debug.Log($"Comma-separated array of size from {minSize} to {maxSize} required for value \"{key}\" of {data.Name} with ID {data.ID}, received {valueString}",LogLevel.Warn,"StrArray");
+                return defaultValue;
             }
             return value;
         }
-
-        public int[] IntArray(string key, int? size = null, int[] defaultValue = null)
+        public int[] IntArray(string key, int? minSize = null, int? maxSize=null, int[] defaultValue = null)
         {
-            string[] attrArray = data.AttrArray(key, size);
-            return attrArray == null ? defaultValue : Array.ConvertAll(attrArray,int.Parse);
+            return Utils.TryConvertAll(data.AttrArray(key, minSize,maxSize),out int[] converted,int.TryParse) ? converted : defaultValue;
         }
 
-        public float[] FloatArray(string key, int? size = null, float[] defaultValue = null)
+        public float[] FloatArray(string key, int? minSize = null, int? maxSize = null, float[] defaultValue = null)
         {
-            string[] attrArray = data.AttrArray(key, size);
-            return attrArray == null ? defaultValue : Array.ConvertAll(attrArray,float.Parse);
+            return Utils.TryConvertAll(data.AttrArray(key, minSize,maxSize),out float[] converted,float.TryParse) ? converted : defaultValue;
         }
 
-        public Vector2 Vector2(string key, Vector2 defaultValue = default)
+        public Vector2 Vector2Grouped(string key, Vector2 defaultValue = default)
         {
-            float[] arrayVector = data.FloatArray(key, 2);
+            float[] arrayVector = data.FloatArray(key, 2,2);
             return arrayVector == null ? defaultValue : new Vector2(arrayVector[0],arrayVector[1]);
         }
     }
@@ -75,9 +71,10 @@ internal static class Extensions
 
     extension(Player player)
     {
-        public void ForceDash(Vector2? dashdir = null, bool red = false)
+        public void ForceDash(Vector2? dashdir = null, bool red = false, bool forced = true)
         {
-            SetNextDashDir(player,dashdir);
+            player.SetNextDashDir(dashdir);
+            player.GetSafe<DataPlayer>().forcedDash = forced;
             player.StateMachine.ForceState(red ? Player.StRedDash : Player.StDash);
         }
 
@@ -94,7 +91,7 @@ internal static class Extensions
             DashDirOverrider ddr = player.GetSafe<DashDirOverrider>();
             ddr.SetDefault(dashdirfunc);
             Debug.Log(
-                $"Setting default Player dash direction to {dashdirfunc}",LogLevel.Verbose,"SetDefaultDashDir");
+                $"Setting default Player dash direction",LogLevel.Verbose,"SetDefaultDashDir");
         }
     }
 }

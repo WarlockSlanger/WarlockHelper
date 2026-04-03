@@ -11,20 +11,24 @@ namespace Celeste.Mod.WarlockHelper.Entities;
 
 public class DashDirController : Entity
 {
-    public Func<Player,Vector2> DashDirFunc;
-    public bool OverrideNeutral;
-    
+    private readonly Func<Player,Vector2> DashDirFunc;
+
     private Player Player;
     public DashDirController(EntityData data, Vector2 _)
     {
-        OverrideNeutral = data.Bool("overrideNeutral");
-        Vector2 neutralLeft = data.Vector2("neutralLeft"), neutralRight=data.Vector2("neutralRight");
-        if (data.Has("direction"))
+        bool overrideNeutral = data.Bool("overrideNeutral");
+        Vector2 neutralLeft = data.Vector2Grouped("neutralLeft"), neutralRight=data.Vector2Grouped("neutralRight");
+        if (data.Int("_mode") == 0)
         {
-            Utils.Matrix2x2 matrix = new(data.FloatArray("direction"));
-            DashDirFunc = ((Player player) =>
+            Utils.Matrix2x2 matrix = new (data.FloatArray("direction",6,6,[1,0,0,1,0,0]));
+            if (!overrideNeutral)
             {
-                if (OverrideNeutral || Input.Aim.Value == Vector2.Zero)
+                neutralLeft = LEFT.Transform(matrix);
+                neutralRight = RIGHT.Transform(matrix);
+            }
+            DashDirFunc = (player =>
+            {
+                if (Input.Aim.Value == Vector2.Zero)
                 {
                     return player.Facing == Facings.Left ? neutralLeft:neutralRight;
                 }
@@ -35,19 +39,24 @@ public class DashDirController : Entity
         else
         {
             Vector2[] dirs =
+            [
+                data.Vector2Grouped("right",RIGHT),
+                data.Vector2Grouped("downRight",DOWNRIGHT),
+                data.Vector2Grouped("down",DOWN),
+                data.Vector2Grouped("downLeft",DOWNLEFT),
+                data.Vector2Grouped("left",LEFT),
+                data.Vector2Grouped("upLeft",UPLEFT),
+                data.Vector2Grouped("up",UP),
+                data.Vector2Grouped("upRight",UPRIGHT)
+            ];
+            if (!overrideNeutral)
             {
-                data.Vector2("right",RIGHT),
-                data.Vector2("downRight",DOWNRIGHT),
-                data.Vector2("down",DOWN),
-                data.Vector2("downLeft",DOWNLEFT),
-                data.Vector2("left",LEFT),
-                data.Vector2("upLeft",UPLEFT),
-                data.Vector2("up",UP),
-                data.Vector2("upRight",UPRIGHT),
-            };
-            DashDirFunc = ((Player player) =>
+                neutralLeft = dirs[LEFT.Angle8()];
+                neutralRight = dirs[RIGHT.Angle8()];
+            }
+            DashDirFunc = (player =>
             {
-                if (OverrideNeutral || Input.Aim.Value == Vector2.Zero)
+                if (Input.Aim.Value == Vector2.Zero)
                 {
                     return player.Facing == Facings.Left ? neutralLeft:neutralRight;
                 }

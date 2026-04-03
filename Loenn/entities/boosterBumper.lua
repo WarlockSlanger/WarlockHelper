@@ -1,56 +1,66 @@
-	local spriteSizeHalf = 11
-	local boosterBumper = {}
-	boosterBumper.name = "WarlockHelper/BoosterBumper"
-	boosterBumper.depth = 0
-	boosterBumper.nodeLineRenderType = "line"
-function boosterBumper.texture(room, entity)
-    local red = entity.red
-    if red then
-        return "objects/WarlockHelper/boosterBumper/idleRed30"
+local mods = require("mods")
+local wsUtils = mods.requireFromPlugin("libraries.utils")
+local ftype = mods.requireFromPlugin("libraries.fieldTypes")
 
-    else
-        return "objects/WarlockHelper/boosterBumper/idle30"
-    end
+local spriteSize = 22
+
+local boosterBumper = {}
+boosterBumper.name = "WarlockHelper/BoosterBumper"
+function boosterBumper.depth(room, entity)
+	return entity.Depth or 0
 end
-	function boosterBumper.selection(room, entity) 
-		local x, y = entity.x or 0, entity.y or 0
-		local nodes = entity.nodes or {}
 
-		local nodeRects = {}
-		for i, node in ipairs(nodes) do
-			nodeRects[i] = utils.rectangle(node.x - spriteSizeHalf, node.y - spriteSizeHalf, spriteSizeHalf*2, spriteSizeHalf*2)
-		end
+boosterBumper.nodeLineRenderType = "line"
 
-		return utils.rectangle(x - spriteSizeHalf, y - spriteSizeHalf, spriteSizeHalf*2, spriteSizeHalf*2), nodeRects
+function boosterBumper.texture(room, entity)
+	local red = entity.red
+	if red then
+		return "objects/WarlockHelper/boosterBumper/idleRed30"
 	end
-	boosterBumper.nodeLimits = {0, 1}
-	boosterBumper.placements = {
-		{
-			name = "normal",
-			data = {
-				snapDirection = false,
-				red = false,
-				wobbling = false,
-				direction = "1,0,0,1",
-				respawnTime = 0.6,
-				moveCycleTime = 1.8181819,
-				wobbleRate = 0.44,
-				wobbleStrength = 1.0,
-			}
-		},
-		{
-			name = "red",
-			data = {
-				snapDirection = false,
-				red = true,
-				wobbling = false,
-				direction = "1,0,0,1",
-				respawnTime = 0.6,
-				moveCycleTime = 1.8181819,
-				wobbleRate = 0.44,
-				wobbleStrength = 1.0,
-			}
-		},
-	}
+	return "objects/WarlockHelper/boosterBumper/idle30"
+end
 
-	return boosterBumper
+function boosterBumper.selection(room, entity) 
+	return wsUtils.selectRect(entity,spriteSize);
+end
+
+boosterBumper.fieldInformation = {
+	Depth = ftype.depth,
+	direction = ftype.matrix,
+}
+
+boosterBumper.nodeLimits = {0, 1}
+boosterBumper.placements = {
+	{
+		name = "normal",
+		data = {
+			Depth=2000,
+			snapDirection = false,
+			red = false,
+			wobbling = false,
+			forcedDash = true,
+			direction = ftype.matrix.default,
+			respawnTime = 0.6,
+			moveCycleTime = 1.8181819,
+			wobbleRate = 0.44,
+			wobbleStrength = 1.0,
+		}
+	},
+	{
+		name = "red",
+		data = {
+			Depth=2000,
+			snapDirection = false,
+			red = true,
+			wobbling = false,
+			forcedDash = true,
+			direction = ftype.matrix.default,
+			respawnTime = 0.6,
+			moveCycleTime = 1.8181819,
+			wobbleRate = 0.44,
+			wobbleStrength = 1.0,
+		}
+	},
+}
+
+return boosterBumper
