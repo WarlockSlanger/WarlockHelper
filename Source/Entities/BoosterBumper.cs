@@ -8,6 +8,7 @@ namespace Celeste.Mod.WarlockHelper.Entities;
 [CustomEntity("WarlockHelper/BoosterBumper")]
 public class BoosterBumper : Entity
 {
+    
     private static readonly ParticleType P_Ambience = new ParticleType
     {
         Source = GFX.Game["particles/rect"],
@@ -47,14 +48,16 @@ public class BoosterBumper : Entity
     private Vector2 anchor;
     private bool active=true;
 
-    private float RespawnTime;
-    private bool Red;
-    private bool Wobbling;
-    private bool SnapDirection;
-    private bool ForcedDash;
-    private bool Respawning;
-
-    private float WobbleStrength;
+    public bool Red;
+    public bool Wobbling;
+    public bool SnapDirection;
+    public bool SilentDash;
+    public bool DashCooldown;
+    public bool DashInterrupt;
+    public bool DashSuper;
+    public bool SnapPosition;
+    public bool Respawning;
+    
     private Func<Vector2,Vector2> DashDirFunc;
     
     private Sprite Sprite;
@@ -69,34 +72,36 @@ public class BoosterBumper : Entity
         Red = data.Bool("red",false);
         Wobbling = data.Bool("wobbling",false);
         SnapDirection = data.Bool("snapDirection",false);
-        RespawnTime = data.Float("respawnTime",0.6f);
-        ForcedDash = data.Bool("forcedDash", true);
+        SilentDash = data.Bool("silentDash", true);
+        DashCooldown = data.Bool("dashCooldown", true);
+        DashInterrupt = data.Bool("dashInterrupt", false);
+        DashSuper = data.Bool("dashSuper", false);
+        SnapPosition = data.Bool("snapPosition", false);
 
         Depth = data.Int("Depth",Depths.Below);
 
-        Respawning = RespawnTime >= 0f;
+        float respawnTime = data.Float("respawnTime",0.6f);
+        Respawning = respawnTime >= 0f;
+        Add(alarm = Alarm.Create(Alarm.AlarmMode.Persist,Reactivate,respawnTime));
         
         Utils.Matrix2x2 matrix = new(data.FloatArray("direction",6,6,[1,0,0,1,0,0]));
         DashDirFunc = dir => dir.Transform(matrix);
         
-        Collider = new Circle(12f);
+        Collider = new Circle(Utils.RadBumper);
         Add(new PlayerCollider(OnPlayer));
         if (Wobbling)
         {
-            float wobbleRate = data.Float("wobbleRate", 0.44f);
-            WobbleStrength = data.Float("wobbleStrength", 1f);
-            Add(sine = new SineWave(wobbleRate, 0f).Randomize());
+            Add(sine = new SineWave(Bumper.SineCycleFreq, 0f).Randomize());
         }
         Add(Sprite = GFX.SpriteBank.Create(Red ? "warlockHelper_boosterBumper_red" : "warlockHelper_boosterBumper"));
         Add(light = new VertexLight(Color.MediumVioletRed, 1f, 16, 32));
         Add(bloom = new BloomPoint(0.5f, 16f));
         
-        Add(alarm = Alarm.Create(Alarm.AlarmMode.Persist,Reactivate,RespawnTime));
         Vector2? node = data.FirstNodeNullable(offset);
         anchor = Position;
         if (node.HasValue)
         {
-            float moveCycleTime = data.Float("moveCycleTime",1.8181819f);
+            float moveCycleTime = data.Float("moveCycleTime",Bumper.MoveCycleTime);
             Vector2 start = Position;
             Vector2 end = node.Value;
             Tween tween = Tween.Create(Tween.TweenMode.YoyoLooping, Ease.CubeInOut, moveCycleTime, start: true);
@@ -116,7 +121,7 @@ public class BoosterBumper : Entity
             Position = anchor;
             return;
         }
-        Position = anchor + new Vector2(sine.Value * 3.0f, sine.ValueOverTwo * 2.0f) * WobbleStrength;
+        Position = anchor + new Vector2(sine.Value * 3.0f, sine.ValueOverTwo * 2.0f);
     }
     public override void Update()
     {
@@ -138,15 +143,21 @@ public class BoosterBumper : Entity
         Collidable = false;
         Audio.Play("event:/game/06_reflection/pinballbumper_hit", Position);
         Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-        Celeste.Freeze(0.1f);
         Vector2 dir = (player.Center - Center).SafeNormalize(Vector2.UnitY);
         if (SnapDirection)
         {
             dir = dir.EightWayNormal();
         }
 
+        if (SnapPosition)
+        {
+            Vector2 pos = Position+ dir.SafeNormalize() * Utils.RadBumper- player.Collider.Center;
+            player.MoveToX(pos.X);
+            player.MoveToY(pos.Y);
+        }
         dir = DashDirFunc(dir);
-        player.ForceDash(dir, Red,ForcedDash);
+        Celeste.Freeze(0.1f);
+        player.ForceDash(dashdir: dir, super: DashSuper, red: Red,silent: SilentDash,cooldown: DashCooldown,interrupt: DashInterrupt);
         if(!player.Inventory.NoRefills)
 
         {

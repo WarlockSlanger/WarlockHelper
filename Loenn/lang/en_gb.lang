@@ -7,9 +7,16 @@ entities.WarlockHelper/BoosterBumper.placements.description.normal=Bumper that m
 entities.WarlockHelper/BoosterBumper.placements.name.red=Booster Bumper (Red)
 entities.WarlockHelper/BoosterBumper.placements.description.red=Bumper that causes a red booster-style dash in the direction it is hit.
 entities.WarlockHelper/BoosterBumper.attributes.description.snapDirection=Whether to snap 360-degree dash directions to the 8 normal directions.
-entities.WarlockHelper/BoosterBumper.attributes.description.forcedDash=If true, dashListeners (including Winged Strawberries and Swap Blocks) are not activated by the bumper.
+entities.WarlockHelper/BoosterBumper.attributes.description.silentDash=If true, dashListeners (including Winged Strawberries and Swap Blocks) are not activated by the bumper.
+entities.WarlockHelper/BoosterBumper.attributes.description.dashInterrupt=Whether the player can dash out of the bumper dash.
+entities.WarlockHelper/BoosterBumper.attributes.name.dashInterrupt=Allow Interrupting Dash
+entities.WarlockHelper/BoosterBumper.attributes.description.dashCooldown=Whether the player's dash cooldown starts upon hitting the bumper.
+entities.WarlockHelper/BoosterBumper.attributes.description.dashSuper=Whether the bumper causes a Super Dash. Doesn't affect Red bumpers.
+entities.WarlockHelper/BoosterBumper.attributes.name.dashSuper=Super Dash
+entities.WarlockHelper/BoosterBumper.attributes.description.snapPosition=Whether the player's position gets snapped to the corresponding point on the bumper's edge.
 entities.WarlockHelper/BoosterBumper.attributes.description.respawnTime=How long the bumper takes to reactivate after hitting. Set to negative to make it one-use.
-entities.WarlockHelper/BoosterBumper.attributes.description.direction=Changes the dash direction. First 4 values are 2x2 matrix elements, 2 values after are a fixed offset vector.
+entities.WarlockHelper/BoosterBumper.attributes.description.direction=Changes the dash direction and speed. First 4 values are 2x2 matrix elements, 2 values after are a fixed offset vector.
+entities.WarlockHelper/BoosterBumper.attributes.description.moveCycleTime=If the bumper has a node, the time for the bumper to move back and forth.
 
 # Dash Direction Controller
 entities.WarlockHelper/DashDirController.placements.name.normal=Dash Direction Controller (Matrix)

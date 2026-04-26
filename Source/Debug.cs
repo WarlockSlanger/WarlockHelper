@@ -17,6 +17,15 @@ internal static class Debug
         message ??= "";
         Logger.Log(logLevel,tag,message);
     }
+
+    internal static void DLog(String message)
+    {
+        Log($"DEBUGLOG WSH {message}");
+    }
+    internal static void DILog(int val)
+    {
+        DLog(val.ToString());
+    }
     public static componentIds ComponentIds = new(); 
     public class componentIds
     {

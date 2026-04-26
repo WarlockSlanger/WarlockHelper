@@ -2,11 +2,57 @@ using Microsoft.Xna.Framework;
 using Monocle;
 using System;
 using Celeste.Mod.WarlockHelper.Components;
+using MonoMod.Cil;
+using MonoMod.InlineRT;
 
 namespace Celeste.Mod.WarlockHelper;
 
-internal static class Extensions
+public static class Extensions
 {
+    extension(Level level)
+    {
+        internal void RespawnNewRoom(string Level, Vector2? RespawnPoint=null,  Vector2? DieVector=null, Player.IntroTypes IntroType=Player.IntroTypes.Respawn, float delay=0f, Player player = null)
+        {
+            player ??= level.Tracker.GetEntity<Player>();
+            Leader.StoreStrawberries(player.Leader);
+            PlayerDeadBody playerDeadBody = player.Die((DieVector??Vector2.Zero).SafeNormalize(), evenIfInvincible: true,
+                registerDeathInStats: false);
+            playerDeadBody.DeathAction = () =>
+            {
+                level.OnEndOfFrame += () =>
+                {
+                    level.UnloadLevel();
+                    level.Session.Level = Level;
+                    level.Session.RespawnPoint = level.GetSpawnPoint(RespawnPoint ?? new Vector2(level.Bounds.Left, level.Bounds.Top));
+                    level.Session.FirstLevel = false;
+                    level.LoadLevel(IntroType);
+                    Leader.RestoreStrawberries(level.Tracker.GetEntity<Player>().Leader);
+                };
+            };
+            playerDeadBody.ActionDelay = delay;
+        }
+
+        internal void LoadNewRoom(string Level, Vector2? RespawnPoint=null, Player player = null)
+        {
+            player ??= level.Tracker.GetEntity<Player>();
+            level.OnEndOfFrame += () =>
+            {
+                Vector2 oldLevelOffset = level.LevelOffset;
+                Vector2 vector = player.Position - oldLevelOffset;
+                Vector2 vector2 = level.Camera.Position - oldLevelOffset;
+                level.Remove(player);
+                level.UnloadLevel();
+                level.Session.Level = Level;
+                level.Session.RespawnPoint = level.GetSpawnPoint(RespawnPoint ?? new Vector2(level.Bounds.Left, level.Bounds.Top));
+                level.Session.FirstLevel = false;
+                level.LoadLevel(Player.IntroTypes.Transition);
+                level.Camera.Position = level.LevelOffset + vector2;
+                level.Add(player);
+                player.Position = level.LevelOffset + vector;
+                player.Hair.MoveHairBy(level.LevelOffset - oldLevelOffset);
+            };
+        }
+    }
     extension(Entity entity)
     {
         public T GetSafe<T>() where T : Component, new()
@@ -58,23 +104,35 @@ internal static class Extensions
 
     extension(Vector2 vector)
     {
-        public Vector2 Transform(Utils.Matrix2x2 matrix)
+        internal Vector2 Transform(Utils.Matrix2x2 matrix)
         {
             return new Vector2(vector.X*matrix.A + vector.Y*matrix.B + matrix.X, vector.X*matrix.C + vector.Y*matrix.D + matrix.Y);
         }
 
         public int Angle8()
         {
-            return ((int)Math.Round(vector.Angle() * 4 / Math.PI)+8)%8;
+            return Utils.mod((int)Math.Round(vector.Angle() * 8 / Math.Tau),8);
+        }
+        public Vector2 SnapDirection(int resolution=8,float center=0f)
+        {
+            float unit = (float)Math.Tau / resolution;
+            float angle = vector.Angle()-center;
+            angle = (float)Math.Round(angle / unit)*unit;
+            angle += center;
+            return Utils.fromAngle(vector.Length(), angle);
         }
     }
 
     extension(Player player)
     {
-        public void ForceDash(Vector2? dashdir = null, bool red = false, bool forced = true)
+        public void ForceDash(Vector2? dashdir = null,bool super=false, bool red = false, bool silent= true, bool cooldown=true, bool interrupt = false)
         {
+            var dmod = player.GetSafe<DashModifier>();
             player.SetNextDashDir(dashdir);
-            player.GetSafe<DataPlayer>().forcedDash = forced;
+            dmod.cooldown = cooldown;
+            dmod.silent = silent;
+            dmod.changeInterrupt = red^interrupt;
+            dmod.super = super;
             player.StateMachine.ForceState(red ? Player.StRedDash : Player.StDash);
         }
 
@@ -82,16 +140,27 @@ internal static class Extensions
         {
             DashDirOverrider ddr = player.GetSafe<DashDirOverrider>();
             ddr.SetCurrent(dashdir);
-            Debug.Log(
-                $"Forcing next Player dash direction to {dashdir}",LogLevel.Verbose,"SetNextDashDir");
         }
 
         public void SetDefaultDashDir(Func<Player,Vector2> dashdirfunc)
         {
             DashDirOverrider ddr = player.GetSafe<DashDirOverrider>();
             ddr.SetDefault(dashdirfunc);
-            Debug.Log(
-                $"Setting default Player dash direction",LogLevel.Verbose,"SetDefaultDashDir");
+        }
+    }
+
+    extension(ILCursor cursor)
+    {
+        internal void emitThis(bool coroutine = false)
+        {
+            if (coroutine)
+            {
+                cursor.EmitLdloc1();
+            }
+            else
+            {
+                cursor.EmitLdarg0();
+            }
         }
     }
 }

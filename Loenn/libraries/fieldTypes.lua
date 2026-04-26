@@ -13,6 +13,7 @@ fieldTypes.matrix = {
 	default = "1,0,0,1,0,0",
 }
 
+--this ones for when there are a lot of them so individual X and Y for each would be too much
 fieldTypes.vector2 = {
 	fieldType = "list",
 	minimumElements = 2,

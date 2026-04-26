@@ -6,6 +6,23 @@ namespace Celeste.Mod.WarlockHelper
 {
     internal static class Utils
     {
+        public static int mod(int p, int q)
+        {
+            int val = p % q;
+            if (val < 0)
+            {
+                val += q;
+            }
+
+            return val;
+        }
+
+
+        public static Vector2 fromAngle(float length, float angle)
+        {
+            return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * length;
+        }
+        public const float RadBumper = 12f;
         public static class Dir8
         {
             public static readonly Vector2 RIGHT = Vector2.UnitX;
@@ -16,8 +33,6 @@ namespace Celeste.Mod.WarlockHelper
             public static readonly Vector2 UPLEFT = (-Vector2.UnitX).Rotate((float)Math.PI / 4f);
             public static readonly Vector2 UP = -Vector2.UnitY;
             public static readonly Vector2 UPRIGHT = (-Vector2.UnitY).Rotate((float)Math.PI / 4f);
-
-            public static readonly Vector2[] DIRS = [RIGHT, UPRIGHT, UP, UPLEFT, LEFT, DOWNLEFT, DOWN, DOWNRIGHT];
         }
 
         public class Matrix2x2

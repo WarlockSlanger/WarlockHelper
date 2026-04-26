@@ -76,8 +76,6 @@ public class DashDirController : Entity
         base.Awake(scene);
         Player = scene.Tracker.GetEntity<Player>();
         Player.SetDefaultDashDir(DashDirFunc);
-        Debug.Log(
-            $"Dash Direction Controller from room {SourceData.Level.Name} activated",LogLevel.Verbose,"DashDirController.Removed");
     }
 
     public override void Removed(Scene scene)
@@ -91,8 +89,5 @@ public class DashDirController : Entity
             }
         }
         Player.SetDefaultDashDir(null);
-        Debug.Log(
-            $"Dash Direction Controller from room {SourceData.Level.Name} deactivated", LogLevel.Verbose,
-            "DashDirController.Removed");
     }
 }

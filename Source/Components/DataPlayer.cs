@@ -6,5 +6,8 @@ namespace Celeste.Mod.WarlockHelper.Components;
 
 public class DataPlayer() : Component(active: true, visible: false)
 {
-    public bool forcedDash = false;
+    public bool dashInterrupt;
+    public bool dashListenersSkipped;
+    public bool dashHasCD;
+    public bool dashSuper;
 }
