@@ -46,6 +46,7 @@ public class WarlockHelperModule : EverestModule {
         IL.Celeste.Player.RedDashUpdate += Player_redDashUpdateMod;
         dashCoroutineHook = new ILHook(typeof(Player).GetMethod("DashCoroutine", BindingFlags.NonPublic | BindingFlags.Instance)!.GetStateMachineTarget()!, Player_dashCoroutineMod);
         redDashCoroutineHook = new ILHook(typeof(Player).GetMethod("RedDashCoroutine", BindingFlags.NonPublic | BindingFlags.Instance)!.GetStateMachineTarget()!, Player_redDashCoroutineMod);
+        DashDirOverrider.Load();
     }
 
     public override void Unload()
@@ -59,6 +60,7 @@ public class WarlockHelperModule : EverestModule {
         dashCoroutineHook = null;
         redDashCoroutineHook.Dispose();
         redDashCoroutineHook = null;
+        DashDirOverrider.Unload();
     }
     
     private static ILHook dashCoroutineHook,redDashCoroutineHook;

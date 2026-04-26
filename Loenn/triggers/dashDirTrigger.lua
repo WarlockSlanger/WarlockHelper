@@ -4,15 +4,14 @@ local ftype = mods.requireFromPlugin("libraries.fieldTypes")
 
 --local logging = require("logging")
 
-local dashDirController = {}
-dashDirController.name = "WarlockHelper/DashDirController"
-dashDirController.depth = -1000000
-dashDirController.texture = "objects/WarlockHelper/dashDirController"
+local dashDirTrigger = {}
+dashDirTrigger.name = "WarlockHelper/DashDirTrigger"
 
-function dashDirController.ignoredFields (entity)
+function dashDirTrigger.ignoredFields (entity)
 	local allFields = {
 	"_name", "_id", "originX", "originY",
-	"_mode",
+	"height","width",
+	"_mode","persistent",
 	"right",
 	"downRight",
 	"down",
@@ -33,7 +32,10 @@ function dashDirController.ignoredFields (entity)
 			table.insert(visible,v)
 		end
 	end
+	show("_mode")
+	show("persistent")
 	show("overrideNeutral")
+
 	if entity.overrideNeutral then
 		show("neutralLeft","neutralRight")
 	end
@@ -55,8 +57,9 @@ function dashDirController.ignoredFields (entity)
 	return wsUtils.setDiff(allFields,visible)
 end
 
-dashDirController.fieldOrder = {
+dashDirTrigger.fieldOrder = {
 	"x","y",
+	"height","width",
 	"right",
 	"downRight",
 	"down",
@@ -69,8 +72,9 @@ dashDirController.fieldOrder = {
 	"neutralRight",
 	"direction",
 	"overrideNeutral",
+	"_mode","persistent"
 }
-dashDirController.fieldInformation = {
+dashDirTrigger.fieldInformation = {
 	direction = ftype.matrix,
 	right=ftype.vector2,
 	downRight=ftype.vector2,
@@ -82,22 +86,23 @@ dashDirController.fieldInformation = {
 	upRight=ftype.vector2,
 	neutralLeft = ftype.vector2,
 	neutralRight = ftype.vector2,
+	_mode = {
+		fieldType=integer,
+		options={
+			{"Disable",-1},
+			{"Matrix",0},
+			{"Replace",1},
+		},
+		editable=false,
+	}
 }
-	dashDirController.placements = {
+	dashDirTrigger.placements = {
 		{
 			name = "normal",
 			data = {
 				_mode = 0,
+				persistent=true,
 				direction = ftype.matrix.default,
-				neutralLeft = "-1,0",
-				neutralRight = "1,0",
-				overrideNeutral=false,
-			}
-		},
-		{
-			name = "map",
-			data = {
-				_mode = 1,
 				right="1,0",
 				downRight="0.70710677,0.70710677",
 				down="0,1",
@@ -108,9 +113,9 @@ dashDirController.fieldInformation = {
 				upRight="0.70710677,-0.70710677",
 				neutralLeft = "-1,0",
 				neutralRight = "1,0",
-				overrideNeutral = false,
+				overrideNeutral=false,
 			}
 		}
 	}
 
-	return dashDirController
+	return dashDirTrigger

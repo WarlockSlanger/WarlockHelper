@@ -48,6 +48,18 @@ public class DashDirOverrider() : Component(active: true, visible: false)
         defaultDashDir = dashDirFunc;
     }
 
-    
+    internal static void SetSessionDashDir(Player player)
+    {
+        player.SetDefaultDashDir(WarlockHelperModule.ModSession.DefaultDashDirection);
+    }
+    internal static void Load()
+    {
+        Everest.Events.Player.OnSpawn += SetSessionDashDir;
+    }
+    internal static void Unload()
+    {
+        Everest.Events.Player.OnSpawn -= SetSessionDashDir;
+    }
 
+    
 }
