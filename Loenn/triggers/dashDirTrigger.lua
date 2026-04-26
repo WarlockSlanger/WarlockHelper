@@ -34,25 +34,27 @@ function dashDirTrigger.ignoredFields (entity)
 	end
 	show("_mode")
 	show("persistent")
-	show("overrideNeutral")
-
-	if entity.overrideNeutral then
-		show("neutralLeft","neutralRight")
-	end
-	if entity._mode == 0 then
-		show("direction")
-	end
-	if entity._mode == 1 then
-		show(
-			"right",
-			"downRight",
-			"down",
-			"downLeft",
-			"left",
-			"upLeft",
-			"up",
-			"upRight"
-		)
+	
+	if entity._mode ~= -1 then
+		show("overrideNeutral")
+		if entity.overrideNeutral then
+			show("neutralLeft","neutralRight")
+		end
+		if entity._mode == 0 then
+			show("direction")
+		end
+		if entity._mode == 1 then
+			show(
+				"right",
+				"downRight",
+				"down",
+				"downLeft",
+				"left",
+				"upLeft",
+				"up",
+				"upRight"
+			)
+		end
 	end
 	return wsUtils.setDiff(allFields,visible)
 end

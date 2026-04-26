@@ -269,6 +269,5 @@ public class WarlockHelperModule : EverestModule {
         cursor.TryGotoNext(MoveType.Before, instr => instr.MatchRet()); //direct return
         cursor.MarkLabel(ToReturn);
         */
-        
     }
 }
