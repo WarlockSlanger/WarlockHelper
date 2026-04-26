@@ -18,12 +18,13 @@ entities.WarlockHelper/BoosterBumper.attributes.description.respawnTime=How long
 entities.WarlockHelper/BoosterBumper.attributes.description.direction=Changes the dash direction and speed. First 4 values are 2x2 matrix elements, 2 values after are a fixed offset vector.
 entities.WarlockHelper/BoosterBumper.attributes.description.moveCycleTime=If the bumper has a node, the time for the bumper to move back and forth.
 
-# Dash Direction Controller
-entities.WarlockHelper/DashDirController.placements.name.normal=Dash Direction Controller (Matrix)
-entities.WarlockHelper/DashDirController.placements.name.map=Dash Direction Controller (Replace)
-entities.WarlockHelper/DashDirController.placements.description.normal=Controller which alters the direction and speed of the player's dash.
-entities.WarlockHelper/DashDirController.placements.description.map=Controller which replaces the direction and speed of the player's dash.
-entities.WarlockHelper/DashDirController.attributes.description.direction=Changes the dash direction. First 4 values are 2x2 matrix elements, 2 values after are a fixed offset vector.
-entities.WarlockHelper/DashDirController.attributes.description.neutralLeft=Dash direction when the player isn't holding a direction and is facing left.
-entities.WarlockHelper/DashDirController.attributes.description.neutralRight=Dash direction when the player isn't holding a direction and is facing right.
-entities.WarlockHelper/DashDirController.attributes.description.overrideNeutral=Whether not holding a direction should dash forwards or in a custom direction (reopen menu for options).
+# Dash Direction Trigger
+triggers.WarlockHelper/DashDirTrigger.placements.name.normal=Dash Direction Trigger
+triggers.WarlockHelper/DashDirTrigger.placements.description.normal=Trigger which alters the direction and speed of the player's dash.
+triggers.WarlockHelper/DashDirTrigger.attributes.description.direction=Changes the dash direction. First 4 values are 2x2 matrix elements, 2 values after are a fixed offset vector.
+triggers.WarlockHelper/DashDirTrigger.attributes.description.neutralLeft=Dash direction when the player isn't holding a direction and is facing left.
+triggers.WarlockHelper/DashDirTrigger.attributes.description.neutralRight=Dash direction when the player isn't holding a direction and is facing right.
+triggers.WarlockHelper/DashDirTrigger.attributes.description.overrideNeutral=Whether not holding a direction should dash forwards or in a custom direction (reopen menu for options).
+triggers.WarlockHelper/DashDirTrigger.attributes.name._mode=Mode
+triggers.WarlockHelper/DashDirTrigger.attributes.description._mode=Disable: resets dash direction to normal.\nMatrix: alters dash direction with a 2x2 matrix and offset.\nReplace: manually replaces the 8 dash directions.\nReopen the menu after changing for options.
+triggers.WarlockHelper/DashDirTrigger.attributes.description.persistent=Allows the player's dash direction to not get reset upon death.
