@@ -30,7 +30,7 @@ boosterBumper.fieldInformation = {
 }
 
 boosterBumper.nodeLimits = {0, 1}
-boosterBumper.placements = {
+--[[boosterBumper.placements = {
 	{
 		name = "normal",
 		data = {
@@ -65,6 +65,6 @@ boosterBumper.placements = {
 			moveCycleTime = 1.8181819,
 		}
 	},
-}
+}]]
 
 return boosterBumper
