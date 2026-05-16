@@ -125,11 +125,11 @@ public static class Extensions
 
     extension(Player player)
     {
-        public void ForceDash(Vector2? dashdir = null,bool super=false, bool red = false, bool silent= true, bool cooldown=true, bool interrupt = false)
+        public void ForceDash(Vector2? dashdir = null,bool super=false, bool red = false, bool silent= true, bool noCooldown=false, bool interrupt = false)
         {
             var dmod = player.GetSafe<DashModifier>();
             player.SetNextDashDir(dashdir);
-            dmod.cooldown = cooldown;
+            dmod.noCooldown = noCooldown;
             dmod.silent = silent;
             dmod.changeInterrupt = red^interrupt;
             dmod.super = super;
@@ -138,13 +138,13 @@ public static class Extensions
 
         public void SetNextDashDir(Vector2? dashdir = null)
         {
-            DashDirOverrider ddr = player.GetSafe<DashDirOverrider>();
+            DashModifier ddr = player.GetSafe<DashModifier>();
             ddr.SetCurrent(dashdir);
         }
 
         public void SetDefaultDashDir(Func<Player,Vector2> dashdirfunc)
         {
-            DashDirOverrider ddr = player.GetSafe<DashDirOverrider>();
+            DashModifier ddr = player.GetSafe<DashModifier>();
             ddr.SetDefault(dashdirfunc);
         }
     }

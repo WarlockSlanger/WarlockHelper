@@ -8,7 +8,8 @@ namespace Celeste.Mod.WarlockHelper.Entities;
 [CustomEntity("WarlockHelper/BoosterBumper")]
 public class BoosterBumper : Entity
 {
-    
+    public const float RadBumper = 12f;
+
     private static readonly ParticleType P_Ambience = new ParticleType
     {
         Source = GFX.Game["particles/rect"],
@@ -87,7 +88,7 @@ public class BoosterBumper : Entity
         Utils.Matrix2x2 matrix = new(data.FloatArray("direction",6,6,[1,0,0,1,0,0]));
         DashDirFunc = dir => dir.Transform(matrix);
         
-        Collider = new Circle(Utils.RadBumper);
+        Collider = new Circle(RadBumper);
         Add(new PlayerCollider(OnPlayer));
         if (Wobbling)
         {
@@ -151,13 +152,13 @@ public class BoosterBumper : Entity
 
         if (SnapPosition)
         {
-            Vector2 pos = Position+ dir.SafeNormalize() * Utils.RadBumper- player.Collider.Center;
+            Vector2 pos = Position+ dir.SafeNormalize() * RadBumper- player.Collider.Center;
             player.MoveToX(pos.X);
             player.MoveToY(pos.Y);
         }
         dir = DashDirFunc(dir);
         Celeste.Freeze(0.1f);
-        player.ForceDash(dashdir: dir, super: DashSuper, red: Red,silent: SilentDash,cooldown: DashCooldown,interrupt: DashInterrupt);
+        player.ForceDash(dashdir: dir, super: DashSuper, red: Red,silent: SilentDash,noCooldown: !DashCooldown,interrupt: DashInterrupt);
         if(!player.Inventory.NoRefills)
 
         {

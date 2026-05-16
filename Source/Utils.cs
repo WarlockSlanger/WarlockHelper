@@ -4,7 +4,7 @@ using System;
 
 namespace Celeste.Mod.WarlockHelper
 {
-    internal static class Utils
+    public static class Utils
     {
         public static int mod(int p, int q)
         {
@@ -22,7 +22,6 @@ namespace Celeste.Mod.WarlockHelper
         {
             return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * length;
         }
-        public const float RadBumper = 12f;
         public static class Dir8
         {
             public static readonly Vector2 RIGHT = Vector2.UnitX;
