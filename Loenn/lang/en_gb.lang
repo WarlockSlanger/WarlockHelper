@@ -28,3 +28,19 @@ triggers.WarlockHelper/DashDirTrigger.attributes.description.overrideNeutral=Whe
 triggers.WarlockHelper/DashDirTrigger.attributes.name._mode=Mode
 triggers.WarlockHelper/DashDirTrigger.attributes.description._mode=Disable: resets dash direction to normal.\nMatrix: alters dash direction with a 2x2 matrix and offset.\nReplace: manually replaces the 8 dash directions.\nReopen the menu after changing for options.
 triggers.WarlockHelper/DashDirTrigger.attributes.description.persistent=Allows the player's dash direction to not get reset upon death.
+
+# Momentum Glider
+entities.WarlockHelper/MomentumGlider.placements.name.normal=Momentum Jellyfish
+entities.WarlockHelper/MomentumGlider.placements.description.normal=Jellyfish which flings the player with its momentum when picked up, and can keep the player's momentum when released
+entities.WarlockHelper/MomentumGlider.attributes.description.momentumDrop=When dropping the jellyfish, it keeps the player's momentum instead of falling straight down
+entities.WarlockHelper/MomentumGlider.attributes.description.momentumThrow=When throwing the jellyfish, it also gains the player's momentum
+entities.WarlockHelper/MomentumGlider.attributes.description.momentumPickup=When picking the jellyfish up, the player's speed is influenced by the jellyfish's
+
+# Momentum Theo
+
+entities.WarlockHelper/MomentumTheoCrystal.placements.name.normal=Momentum Theo Crystal
+entities.WarlockHelper/MomentumTheoCrystal.placements.description.normal=Theo Crystal which flings the player with its momentum when picked up, and can keep the player's momentum when released
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.momentumDrop=When dropping the crystal, it keeps the player's momentum instead of falling straight down.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.momentumThrow=When throwing the crystal, it also gains the player's momentum.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.momentumPickup=When picking the crystal up, it influences the player's speed.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.hasTheo=When the Crystal is destroyed, the player dies. Also prevents spawning when entering a room while holding Theo and right transitions without holding something.

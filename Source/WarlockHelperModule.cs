@@ -4,6 +4,7 @@ using Celeste.Mod.WarlockHelper.Components;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System.Reflection;
+using Celeste.Mod.WarlockHelper.Entities;
 using Microsoft.Xna.Framework;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
@@ -48,13 +49,15 @@ public class WarlockHelperModule : EverestModule
         IL.Celeste.Player.RedDashUpdate += Player_redDashUpdateMod;
         dashCoroutineHook =
             new ILHook(
-                typeof(Player).GetMethod("DashCoroutine", BindingFlags.NonPublic | BindingFlags.Instance)!
+                typeof(Player).GetMethod(nameof(Player.DashCoroutine), BindingFlags.NonPublic | BindingFlags.Instance)!
                     .GetStateMachineTarget()!, Player_dashCoroutineMod);
         redDashCoroutineHook =
             new ILHook(
-                typeof(Player).GetMethod("RedDashCoroutine", BindingFlags.NonPublic | BindingFlags.Instance)!
+                typeof(Player).GetMethod(nameof(Player.RedDashCoroutine), BindingFlags.NonPublic | BindingFlags.Instance)!
                     .GetStateMachineTarget()!, Player_redDashCoroutineMod);
         DashModifier.Load();
+        CustomHoldable.Load();
+        CustomTheoCrystal.Load();
     }
 
     public override void Unload()
@@ -69,6 +72,8 @@ public class WarlockHelperModule : EverestModule
         redDashCoroutineHook.Dispose();
         redDashCoroutineHook = null;
         DashModifier.Unload();
+        CustomHoldable.Unload();
+        CustomTheoCrystal.Unload();
     }
 
     private static ILHook dashCoroutineHook, redDashCoroutineHook;
@@ -127,7 +132,7 @@ public class WarlockHelperModule : EverestModule
 
     private static void Player_dashCoroutineMod(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
         overrideDashDir(cursor, true);
 
         cursor.Index = 0;
@@ -136,7 +141,7 @@ public class WarlockHelperModule : EverestModule
 
     private static void Player_redDashCoroutineMod(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
         overrideDashDir(cursor, true);
     }
 
@@ -153,27 +158,18 @@ public class WarlockHelperModule : EverestModule
 
     private static void Player_dashBeginHook(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<Player>(nameof(Player.calledDashEvents))))
-        {
-            return;
-        }
+        ILCursor cursor = new(il);
+        cursor.GotoNext(MoveType.After, instr => instr.MatchStfld<Player>(nameof(Player.calledDashEvents)));
 
         cursor.EmitLdarg0();
         cursor.EmitDelegate(playerSetDashProperties);
-        if (!cursor.TryGotoNextBestFit(MoveType.Before, 64, dashCooldownTarget))
-        {
-            return;
-        }
+        cursor.GotoNextBestFit(MoveType.Before, 64, dashCooldownTarget);
 
         cursor.EmitLdarg0();
         cursor.EmitDelegate(playerGetDashNoCooldown);
         ILLabel AfterCooldowns = cursor.DefineLabel();
         cursor.EmitBrtrue(AfterCooldowns);
-        if (!cursor.TryGotoNextBestFit(MoveType.After, 64, dashCooldownTarget))
-        {
-            return;
-        }
+        cursor.GotoNextBestFit(MoveType.After, 64, dashCooldownTarget);
 
         cursor.MarkLabel(AfterCooldowns);
         cursor.Index = 0;
@@ -182,27 +178,18 @@ public class WarlockHelperModule : EverestModule
 
     private static void Player_redDashBeginHook(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<Player>(nameof(Player.calledDashEvents))))
-        {
-            return;
-        }
+        ILCursor cursor = new(il);
+        cursor.GotoNext(MoveType.After, instr => instr.MatchStfld<Player>(nameof(Player.calledDashEvents)));
 
         cursor.EmitLdarg0();
         cursor.EmitDelegate(playerSetDashProperties);
-        if (!cursor.TryGotoNextBestFit(MoveType.Before, 64, dashCooldownTarget))
-        {
-            return;
-        }
+        cursor.GotoNextBestFit(MoveType.Before, 64, dashCooldownTarget);
 
         cursor.EmitLdarg0();
         cursor.EmitDelegate(playerGetDashNoCooldown);
         ILLabel AfterCooldowns = cursor.DefineLabel();
         cursor.EmitBrtrue(AfterCooldowns);
-        if (!cursor.TryGotoNextBestFit(MoveType.After, 64, dashCooldownTarget))
-        {
-            return;
-        }
+        cursor.GotoNextBestFit(MoveType.After, 64, dashCooldownTarget);
 
         cursor.MarkLabel(AfterCooldowns);
     }
@@ -210,22 +197,15 @@ public class WarlockHelperModule : EverestModule
 
     private static void Player_dashUpdateMod(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
-        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<Player>("get_CanDash")))
-        {
-            return;
-        }
-
+        cursor.GotoNext(MoveType.Before, instr => instr.MatchCallvirt<Player>("get_CanDash"));
         cursor.Index--;
 
         ILLabel CheckCanDash = cursor.DefineLabel();
         cursor.MarkLabel(CheckCanDash);
 
-        if (!cursor.TryGotoPrev(MoveType.Before, instr => instr.MatchLdfld<Assists>(nameof(Assists.SuperDashing))))
-        {
-            return;
-        }
+        cursor.GotoPrev(MoveType.Before, instr => instr.MatchLdfld<Assists>(nameof(Assists.SuperDashing)));
 
         cursor.Index -= 2;
         cursor.MoveAfterLabels();
@@ -239,12 +219,9 @@ public class WarlockHelperModule : EverestModule
 
     private static void Player_redDashUpdateMod(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<Player>("get_CanDash")))
-        {
-            return;
-        }
+        cursor.GotoNext(MoveType.After, instr => instr.MatchCallvirt<Player>("get_CanDash"));
 
         ILLabel NoDash = (ILLabel)cursor.Next.Operand;
         cursor.Index++;
@@ -285,49 +262,39 @@ public class WarlockHelperModule : EverestModule
     private static readonly Func<Instruction, bool>[] earlyReturnDashEvents =
     [
         instr => instr.MatchLdarg(0),
-        instr => instr.MatchLdfld<Player>("calledDashEvents"),
+        instr => instr.MatchLdfld<Player>(nameof(Player.calledDashEvents)),
         instr => instr.MatchBrtrue(out _),
     ];
 
     private static void Player_callDashEventsMod(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
         /*
-        if (!cursor.TryGotoNextBestFit(MoveType.After, earlyReturnDashEvents)) { return; } //forces repeat dash events to avoid PostDashEvents and directly return
+        cursor.GotoNextBestFit(MoveType.After, earlyReturnDashEvents);
         cursor.Index--;
         ILLabel ToReturn = cursor.DefineLabel();
         cursor.EmitBrtrue(ToReturn);
         cursor.EmitLdcI4(0);
         */
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<Player>("calledDashEvents")))
-        {
-            return;
-        } //first dash events
+        cursor.GotoNext(MoveType.After, instr => instr.MatchStfld<Player>("calledDashEvents"));
 
         cursor.EmitLdarg0();
         cursor.EmitDelegate(playerPreDashEvents);
 
-        if (!cursor.TryGotoNextBestFit(MoveType.AfterLabel, dashListenerUpdateBeginTarget))
-        {
-            return;
-        } //attempts to skip dashlisteners
-
+        cursor.GotoNextBestFit(MoveType.AfterLabel, dashListenerUpdateBeginTarget);
         cursor.EmitLdarg0();
         cursor.EmitDelegate(playerGetSkipDashListeners);
         ILLabel PostAllDashEvents = cursor.DefineLabel();
         cursor.EmitBrtrue(PostAllDashEvents);
 
-        if (!cursor.TryGotoNext(MoveType.AfterLabel, instr => instr.MatchRet()))
-        {
-            return;
-        } //last dash events, before return 
+        cursor.GotoNext(MoveType.AfterLabel, instr => instr.MatchRet());
 
         cursor.MarkLabel(PostAllDashEvents);
         /*
         cursor.EmitLdarg0();
         cursor.EmitDelegate(playerPostDashEvents);
 
-        cursor.TryGotoNext(MoveType.Before, instr => instr.MatchRet()); //direct return
+        cursor.GotoNext(MoveType.Before, instr => instr.MatchRet());
         cursor.MarkLabel(ToReturn);
         */
     }

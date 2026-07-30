@@ -2,7 +2,7 @@ using System;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
-using static Celeste.Mod.WarlockHelper.Utils.Dir8;
+using static Celeste.Mod.WarlockHelper.Util.Dir8;
 
 namespace Celeste.Mod.WarlockHelper.Triggers;
 
@@ -13,7 +13,7 @@ public class DashDirTrigger : Trigger
 {
     public class PlayerVectorFuncData
     {
-        public Utils.Matrix2x2 matrix=null;
+        public Util.Matrix2x2 matrix=null;
         public Vector2[] dirs=null;
         public Vector2? neutralLeft = null, neutralRight = null;
     }
@@ -25,7 +25,7 @@ public class DashDirTrigger : Trigger
     internal static Func<Player, Vector2> DataToFunc(PlayerVectorFuncData data)
     {
         if (data?.matrix!=null) {
-                Utils.Matrix2x2 matrix = data.matrix;
+                Util.Matrix2x2 matrix = data.matrix;
                 Vector2 neutralLeft=data.neutralLeft ?? LEFT.Transform(matrix),
                     neutralRight=data.neutralRight ?? RIGHT.Transform(matrix);
 
@@ -75,7 +75,7 @@ public class DashDirTrigger : Trigger
         {
             case 0:
             {
-                pvf.matrix = new(data.FloatArray("direction", 6, 6, [1, 0, 0, 1, 0, 0]));
+                pvf.matrix = new Util.Matrix2x2(data.FloatArray("direction", 6, 6, [1, 0, 0, 1, 0, 0]));
                 break;
             }
             case 1:

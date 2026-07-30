@@ -2,6 +2,8 @@ using Microsoft.Xna.Framework;
 using Monocle;
 using System;
 using Celeste.Mod.WarlockHelper.Components;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.InlineRT;
 
@@ -65,7 +67,6 @@ public static class Extensions
             }
             return comp;
         }
-
     }
     extension(EntityData data)
     {
@@ -87,12 +88,12 @@ public static class Extensions
         }
         public int[] IntArray(string key, int? minSize = null, int? maxSize=null, int[] defaultValue = null)
         {
-            return Utils.TryConvertAll(data.AttrArray(key, minSize,maxSize),out int[] converted,int.TryParse) ? converted : defaultValue;
+            return Util.TryConvertAll(data.AttrArray(key, minSize,maxSize),out int[] converted,int.TryParse) ? converted : defaultValue;
         }
 
         public float[] FloatArray(string key, int? minSize = null, int? maxSize = null, float[] defaultValue = null)
         {
-            return Utils.TryConvertAll(data.AttrArray(key, minSize,maxSize),out float[] converted,float.TryParse) ? converted : defaultValue;
+            return Util.TryConvertAll(data.AttrArray(key, minSize,maxSize),out float[] converted,float.TryParse) ? converted : defaultValue;
         }
 
         public Vector2 Vector2Grouped(string key, Vector2 defaultValue = default)
@@ -104,14 +105,14 @@ public static class Extensions
 
     extension(Vector2 vector)
     {
-        internal Vector2 Transform(Utils.Matrix2x2 matrix)
+        internal Vector2 Transform(Util.Matrix2x2 matrix)
         {
             return new Vector2(vector.X*matrix.A + vector.Y*matrix.B + matrix.X, vector.X*matrix.C + vector.Y*matrix.D + matrix.Y);
         }
 
         public int Angle8()
         {
-            return Utils.mod((int)Math.Round(vector.Angle() * 8 / Math.Tau),8);
+            return Util.mod((int)Math.Round(vector.Angle() * 8 / Math.Tau),8);
         }
         public Vector2 SnapDirection(int resolution=8,float center=0f)
         {
@@ -119,7 +120,7 @@ public static class Extensions
             float angle = vector.Angle()-center;
             angle = (float)Math.Round(angle / unit)*unit;
             angle += center;
-            return Utils.fromAngle(vector.Length(), angle);
+            return Util.fromAngle(vector.Length(), angle);
         }
     }
 
@@ -147,6 +148,27 @@ public static class Extensions
             DashModifier ddr = player.GetSafe<DashModifier>();
             ddr.SetDefault(dashdirfunc);
         }
+
+        public Vector2 GliderBoost(bool sideEffects=false)
+        {
+            Vector2 ans = player.Speed;
+            ans.Y = Math.Min(ans.Y, 0f);
+            if (player.gliderBoostTimer > 0f && player.gliderBoostDir.Y < 0f)
+            {
+                if (sideEffects)
+                {
+                    Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
+                }
+                player.gliderBoostTimer = 0f;
+                ans.Y = Math.Min(ans.Y, -240f * Math.Abs(player.gliderBoostDir.Y));
+            }
+            else if (ans.Y < 0f)
+            {
+                ans.Y = Math.Min(ans.Y, -105f);
+            }
+
+            return ans;
+        }
     }
 
     extension(ILCursor cursor)
@@ -161,6 +183,33 @@ public static class Extensions
             {
                 cursor.EmitLdarg0();
             }
+        }
+    }
+
+    extension(Instruction instr)
+    {
+        internal bool compGeneric(Type[] types)
+        {
+            if (instr.Operand is not GenericInstanceMethod g)
+            {
+                throw new ArgumentException("Instruction operand is not a method");
+            }
+            var args = g.GenericArguments;
+            int n = types.Length;
+            if (args.Count != n)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                if (types[i].FullName != args[i].FullName)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

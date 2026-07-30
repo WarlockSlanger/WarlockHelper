@@ -28,20 +28,16 @@ function wsUtils.setDiff(arr1,arr2)
 	return set
 end
 
-function wsUtils.centeredRect(x,y,w,h)
-	return utils.rectangle(x-w/2,y-h/2,w,h)
-end
-
-function wsUtils.selectRect(entity,size)
-	local x, y = entity.x or 0, entity.y or 0
+function wsUtils.selectRect(entity,offsetX,offsetY,sizeX,sizeY)
+	local x, y = entity.x+offsetX or 0, entity.y+offsetY or 0
 	local nodes = entity.nodes or {}
 
 	local nodeRects = {}
 	for i, node in ipairs(nodes) do
-		nodeRects[i] = wsUtils.centeredRect(node.x, node.y, size, size)
+		nodeRects[i] = utils.rectangle(node.x+offsetX, node.y+offsetY, sizeX, sizeY)
 	end
 
-	return wsUtils.centeredRect(x, y, size, size), nodeRects
+	return utils.rectangle(x, y, sizeX, sizeY), nodeRects
 end
 
 return wsUtils
