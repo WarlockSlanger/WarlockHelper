@@ -27,6 +27,7 @@ public class CustomHoldable() : Component(true,false)
 
     public bool Held=false;
     public Throw ThrowType;
+    public Vector2 force;
 
     public override void Update()
     {
@@ -77,7 +78,8 @@ public class CustomHoldable() : Component(true,false)
             {
                 ch.Held = true;
                 ch.Holder = hold.Holder;
-                hold.Holder.gliderBoostTimer -= 0.16f; //in Vanilla, gliderBoostTimer is checked after the pickup tween ends in PickupCoroutine. here, speed is set Before the animation starts
+                ch.Dir = (float)ch.Holder.Facing;
+                hold.Holder.gliderBoostTimer -= 0.16f; //in Vanilla, gliderBoostTimer is checked after the pickup tween ends in PickupCoroutine. here, speed is set Before the animation starts.
                 if (ch.pickupSpeed != null)
                 {
                     hold.Holder.Speed = ch.pickupSpeed();
@@ -98,9 +100,10 @@ public class CustomHoldable() : Component(true,false)
     private static void customHoldableRelease(Holdable hold, Vector2 force)
     {
         Entity entity = hold.Entity;
-        if (entity.Get<CustomHoldable>() is { } ch)
+        if (entity.Get<CustomHoldable>() is { Held: true } ch) //apparently clear pipes call release so like Only do this if its called by a player throwing it
         {
-            if (force.X == 0f)
+            ch.force = force; 
+            if (force.X == 0f) //hopefully it works fine as is but if some modded entity doesn't work right with this it should be easy to fix
             {
                 ch.ThrowType = Throw.Drop;
             }

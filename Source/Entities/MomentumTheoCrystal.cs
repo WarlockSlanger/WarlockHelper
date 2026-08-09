@@ -8,14 +8,32 @@ namespace Celeste.Mod.WarlockHelper.Entities;
 [CustomEntity("WarlockHelper/MomentumTheoCrystal")]
 public class MomentumTheoCrystal : CustomTheoCrystal
 {
-    public bool MomentumDrop, MomentumThrow, MomentumPickup;
+    public Vector2 ThrowSpeed, ThrowRecoil,
+        DropSpeed, DropRecoil,
+        PickupBoost;
+    
+    public Vector2 ThrowPlayerMass,ThrowCrystalMass,
+        DropPlayerMass, DropCrystalMass,
+        PickupPlayerMass, PickupCrystalMass;
+    
+    public bool CrystalBoost;
+    
     public MomentumTheoCrystal(EntityData data, Vector2 offset)
         : base(data, offset)
     {
         Theo = data.Bool("hasTheo", false);
-        MomentumDrop = data.Bool("momentumDrop", false);
-        MomentumThrow = data.Bool("momentumThrow", true);
-        MomentumPickup = data.Bool("momentumPickup", true);
+        CrystalBoost = data.Bool("crystalBoost", true);
+        ThrowSpeed = data.Vector2Grouped("throwCrystalSpeed", new Vector2(200f,-80f));
+        ThrowRecoil = data.Vector2Grouped("throwPlayerSpeed", new Vector2(-80f,0f));
+        DropSpeed = data.Vector2Grouped("dropCrystalSpeed", Vector2.Zero);
+        DropRecoil = data.Vector2Grouped("dropPlayerSpeed", Vector2.Zero);
+        PickupBoost = data.Vector2Grouped("pickupSpeed", Vector2.Zero);
+        ThrowPlayerMass = data.Vector2Grouped("throwPlayerMomentum", Vector2.One);
+        ThrowCrystalMass = data.Vector2Grouped("throwCrystalMomentum", 0.6f * Vector2.One);
+        DropPlayerMass = data.Vector2Grouped("dropPlayerMomentum", Vector2.One);
+        DropCrystalMass = data.Vector2Grouped("dropCrystalMomentum", Vector2.Zero);
+        PickupPlayerMass = data.Vector2Grouped("pickupPlayerMomentum", Vector2.One);
+        PickupCrystalMass = data.Vector2Grouped("pickupCrystalMomentum", Vector2.One);
         
         Remove(sprite);
         Add(sprite = GFX.SpriteBank.Create(Theo ? "warlockHelper_momentumTheo" : "warlockHelper_momentumCrystal"));
@@ -23,38 +41,49 @@ public class MomentumTheoCrystal : CustomTheoCrystal
         
         CHold.throwSpeed = () =>
         {
-            if (CHold.ThrowType==CustomHoldable.Throw.Throw)
+            if (CHold.ThrowType == CustomHoldable.Throw.Swat)
             {
-                return (MomentumThrow ? CHold.Holder.Speed*0.6f : Vector2.Zero) + new Vector2(CHold.Dir * 200f, -80f);
+                return CHold.Holder.Speed * DropCrystalMass + new Vector2(CHold.Dir*160f,-50f);
             }
-
-            if (CHold.ThrowType == CustomHoldable.Throw.Drop)
+            Vector2 mass;
+            Vector2 speed;
+            bool thrown = CHold.ThrowType == CustomHoldable.Throw.Throw;
+            mass = thrown ? ThrowCrystalMass : DropCrystalMass;
+            speed = thrown ? ThrowSpeed : DropSpeed;
+            speed.X *= CHold.Dir;
+            return CHold.Holder.Speed * mass + speed;
+        };
+        CHold.throwRecoil = () =>
+        {
+            if (CHold.ThrowType == CustomHoldable.Throw.Swat)
             {
-                return MomentumDrop ? CHold.Holder.Speed : Vector2.Zero;
+                return CHold.Holder.Speed*DropPlayerMass + DropRecoil;
             }
-
-            return (MomentumDrop ? CHold.Holder.Speed : Vector2.Zero) + new Vector2(CHold.Dir*160f,-50f);
+            Vector2 mass;
+            Vector2 speed;
+            bool thrown = CHold.ThrowType == CustomHoldable.Throw.Throw;
+            mass = thrown ? ThrowPlayerMass : DropPlayerMass;
+            speed = thrown ? ThrowRecoil : DropRecoil;
+            speed.X *= CHold.Dir;
+            return CHold.Holder.Speed * mass + speed;
         };
         CHold.pickupSpeed = () =>
         {
-            Vector2 playerSpeed=CHold.Holder.Speed;
-            if (!MomentumPickup)
-            {
-                return playerSpeed;
-            }
-            
-            Vector2 theoSpeed = Speed;
-            
-            if (ChargedSpeed(theoSpeed))
+            Vector2 playerSpeed=CHold.Holder.Speed; 
+
+            Vector2 crystalSpeed = Speed;
+            if (ChargedSpeed(crystalSpeed))
             {
                 Audio.Play("event:/game/01_forsaken_city/birdbros_thrust", Position);
             }
-            if (theoSpeed.Y is > 0f and < 160f)
+            if (CrystalBoost && crystalSpeed.Y is > 0f and < 160f)
             {
-                theoSpeed.Y = 0f;
+                crystalSpeed.Y = 0f;
             }
 
-            return playerSpeed + theoSpeed;
+            Vector2 speedBoost = PickupBoost;
+            speedBoost.X *= CHold.Dir;
+            return (playerSpeed*PickupPlayerMass + crystalSpeed*PickupCrystalMass) + speedBoost;
         };
     }
 
@@ -69,7 +98,7 @@ public class MomentumTheoCrystal : CustomTheoCrystal
         }
     }
 
-    private Vector2 ChargeSpeed => Hold.IsHeld ? (MomentumThrow ? Hold.Holder.Speed : Vector2.Zero) : (MomentumPickup ? Speed : Vector2.Zero);
+    private Vector2 ChargeSpeed => Hold.IsHeld ? (ThrowCrystalMass!=Vector2.Zero ? Hold.Holder.Speed : Vector2.Zero) : (PickupCrystalMass!=Vector2.Zero ? Speed : Vector2.Zero);
 
     private bool ChargedSpeed(Vector2 speed)
     {

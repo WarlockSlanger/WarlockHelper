@@ -104,6 +104,11 @@ namespace Celeste.Mod.WarlockHelper
 
         public static bool TryConvertAll<TInput, TOutput>(TInput[] inputs, out TOutput[] outputs, TryConverter<TInput, TOutput> converter)
         {
+            if (inputs == null)
+            {
+                outputs = null;
+                return false;
+            }
             int size = inputs.Length;
             outputs = new TOutput[size];
             for (int i = 0; i < size; i++)

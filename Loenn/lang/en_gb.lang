@@ -32,15 +32,34 @@ triggers.WarlockHelper/DashDirTrigger.attributes.description.persistent=Allows t
 # Momentum Glider
 entities.WarlockHelper/MomentumGlider.placements.name.normal=Momentum Jellyfish
 entities.WarlockHelper/MomentumGlider.placements.description.normal=Jellyfish which flings the player with its momentum when picked up, and can keep the player's momentum when released
-entities.WarlockHelper/MomentumGlider.attributes.description.momentumDrop=When dropping the jellyfish, it keeps the player's momentum instead of falling straight down
-entities.WarlockHelper/MomentumGlider.attributes.description.momentumThrow=When throwing the jellyfish, it also gains the player's momentum
-entities.WarlockHelper/MomentumGlider.attributes.description.momentumPickup=When picking the jellyfish up, the player's speed is influenced by the jellyfish's
+entities.WarlockHelper/MomentumGlider.attributes.description.throwGliderMomentum=How much the player's speed influences the jelly's speed when it's thrown.\n(X and Y scale respectively)
+entities.WarlockHelper/MomentumGlider.attributes.description.throwGliderSpeed=Fixed speed added to jelly's when it's thrown.\nFlipped horizontally if facing left.
+entities.WarlockHelper/MomentumGlider.attributes.description.throwPlayerMomentum=How much of the player's speed is kept when throwing.\n(X and Y scale respectively)
+entities.WarlockHelper/MomentumGlider.attributes.description.throwPlayerSpeed=Fixed speed added to the player's when throwing.\nFlipped horizontally if facing left.
+entities.WarlockHelper/MomentumGlider.attributes.description.dropGliderMomentum=As above, but for dropping instead of throwing.
+entities.WarlockHelper/MomentumGlider.attributes.description.dropGliderSpeed=As above, but for dropping instead of throwing.
+entities.WarlockHelper/MomentumGlider.attributes.description.dropPlayerMomentum=As above, but for dropping instead of throwing.
+entities.WarlockHelper/MomentumGlider.attributes.description.dropPlayerSpeed=As above, but for dropping instead of throwing.
+entities.WarlockHelper/MomentumGlider.attributes.description.pickupGliderMomentum=How much the glider's momentum contributes to the player's upon pickup.\n(X and Y scale respectively)
+entities.WarlockHelper/MomentumGlider.attributes.description.pickupPlayerMomentum=How much of the player's speed is retained upon pickup.\n(X and Y scale respectively)
+entities.WarlockHelper/MomentumGlider.attributes.description.pickupSpeed=Fixed speed added to the player's when picking the jelly up.\nFlipped horizontally if facing left.
+entities.WarlockHelper/MomentumGlider.attributes.description.playerBoost=Dashes, hypers, etc. increase upwards speed upon pickup.
+entities.WarlockHelper/MomentumGlider.attributes.description.gliderBoost=Low downwards speed from the jelly is ignored to make vators more consistent.
 
 # Momentum Theo
 
 entities.WarlockHelper/MomentumTheoCrystal.placements.name.normal=Momentum Theo Crystal
 entities.WarlockHelper/MomentumTheoCrystal.placements.description.normal=Theo Crystal which flings the player with its momentum when picked up, and can keep the player's momentum when released
-entities.WarlockHelper/MomentumTheoCrystal.attributes.description.momentumDrop=When dropping the crystal, it keeps the player's momentum instead of falling straight down.
-entities.WarlockHelper/MomentumTheoCrystal.attributes.description.momentumThrow=When throwing the crystal, it also gains the player's momentum.
-entities.WarlockHelper/MomentumTheoCrystal.attributes.description.momentumPickup=When picking the crystal up, it influences the player's speed.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.throwCrystalMomentum=How much the player's speed influences the crystal's speed when it's thrown.\n(X and Y scale respectively)
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.throwCrystalSpeed=Fixed speed added to crystal's when it's thrown.\nFlipped horizontally if facing left.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.throwPlayerMomentum=How much of the player's speed is kept when throwing.\n(X and Y scale respectively)
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.throwPlayerSpeed=Fixed speed added to the player's when throwing.\nFlipped horizontally if facing left.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.dropCrystalMomentum=As above, but for dropping instead of throwing.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.dropCrystalSpeed=As above, but for dropping instead of throwing.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.dropPlayerMomentum=As above, but for dropping instead of throwing.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.dropPlayerSpeed=As above, but for dropping instead of throwing.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.pickupCrystalMomentum=How much the glider's momentum contributes to the player's upon pickup.\n(X and Y scale respectively)
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.pickupPlayerMomentum=How much of the player's speed is retained upon pickup.\n(X and Y scale respectively)
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.pickupSpeed=Fixed speed added to the player's when picking the crystal up.\nFlipped horizontally if facing left.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.crystalBoost=Low downwards speed from the crystal is ignored to make vators more consistent.
 entities.WarlockHelper/MomentumTheoCrystal.attributes.description.hasTheo=When the Crystal is destroyed, the player dies. Also prevents spawning when entering a room while holding Theo and right transitions without holding something.

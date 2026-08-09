@@ -5,7 +5,6 @@ using Celeste.Mod.WarlockHelper.Components;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using MonoMod.InlineRT;
 
 namespace Celeste.Mod.WarlockHelper;
 

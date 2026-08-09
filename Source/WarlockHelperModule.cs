@@ -8,7 +8,6 @@ using Celeste.Mod.WarlockHelper.Entities;
 using Microsoft.Xna.Framework;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
-using On.Monocle;
 
 namespace Celeste.Mod.WarlockHelper;
 

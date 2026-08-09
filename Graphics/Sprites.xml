@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Sprites>
   <warlockHelper_momentumCrystal path="objects/WarlockHelper/momentumTheo/" start="idle">
-      <Origin x="32" y="42"/>
-      <Loop id="idle" path="idle" frames="0" delay="0.06"/>
-      <Loop id="charged" path="charged" frames="0-10" delay="0.06"/>
+		<Origin x="32" y="42"/>
+		<Loop id="idle" path="idle" delay="0.06"/>
+		<Loop id="charged" path="charged" delay="0.06"/>
   </warlockHelper_momentumCrystal>
+  
   <warlockHelper_momentumTheo path="objects/WarlockHelper/momentumTheo/" start="idle">
-      <Origin x="32" y="42"/>
-      <Loop id="idle" path="idleTheo" frames="0" delay="0.06"/>
-      <Loop id="charged" path="chargedTheo" frames="0-10" delay="0.06"/>
+		<Origin x="32" y="42"/>
+		<Loop id="idle" path="idleTheo" delay="0.06"/>
+		<Loop id="charged" path="chargedTheo" delay="0.06"/>
   </warlockHelper_momentumTheo>
+  
+  <warlockHelper_momentumGlider path="objects/WarlockHelper/momentumGlider/" start="idle">
+		<Justify x="0.5" y="0.58"/>
+		<Loop id="idle" path="idle" delay="0.1"/>
+		<Loop id="held" path="held" delay="0.1"/>
+		<Anim id="fall" path="fall" delay="0.06" goto="fallLoop"/>
+		<Loop id="fallLoop" path="fallLoop" delay="0.06"/>
+		<Anim id="death" path="death" delay="0.06"/>
+  </warlockHelper_momentumGlider>
+  
+  <warlockHelper_chargeOverlay path="objects/WarlockHelper/momentumGlider/">
+		<Justify x="0.5" y="0.58"/>
+		<Anim id="on" path="chargeOverlay" delay="0.06"/>
+  </warlockHelper_chargeOverlay>
 </Sprites>
