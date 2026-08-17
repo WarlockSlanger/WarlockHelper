@@ -17,6 +17,7 @@ momentumTheo.fieldOrder = {
 	"pickupCrystalMomentum","pickupPlayerMomentum",
 	"pickupSpeed",
 	"hasTheo",
+	"playerBoost",
 	"crystalBoost",
 	
 }
@@ -50,6 +51,7 @@ momentumTheo.placements = {
 			pickupCrystalMomentum = "1,1",
 			pickupPlayerMomentum = "1,1",
 			pickupSpeed = "0,0",
+			playerBoost = true,
 			crystalBoost = true,
         }
     }

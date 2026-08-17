@@ -43,7 +43,7 @@ entities.WarlockHelper/MomentumGlider.attributes.description.dropPlayerSpeed=As 
 entities.WarlockHelper/MomentumGlider.attributes.description.pickupGliderMomentum=How much the glider's momentum contributes to the player's upon pickup.\n(X and Y scale respectively)
 entities.WarlockHelper/MomentumGlider.attributes.description.pickupPlayerMomentum=How much of the player's speed is retained upon pickup.\n(X and Y scale respectively)
 entities.WarlockHelper/MomentumGlider.attributes.description.pickupSpeed=Fixed speed added to the player's when picking the jelly up.\nFlipped horizontally if facing left.
-entities.WarlockHelper/MomentumGlider.attributes.description.playerBoost=Dashes, hypers, etc. increase upwards speed upon pickup.
+entities.WarlockHelper/MomentumGlider.attributes.description.playerBoost=Player downwards speed is nullified.\nUpwards boost if moving up, dashing, hypering etc. upon pickup.\n(Applied before rescaling by pickupPlayerMomentum)\nJumping while grabbing or throwing the jelly will counteract its downwards momentum.
 entities.WarlockHelper/MomentumGlider.attributes.description.gliderBoost=Low downwards speed from the jelly is ignored to make vators more consistent.
 
 # Momentum Theo
@@ -61,5 +61,6 @@ entities.WarlockHelper/MomentumTheoCrystal.attributes.description.dropPlayerSpee
 entities.WarlockHelper/MomentumTheoCrystal.attributes.description.pickupCrystalMomentum=How much the glider's momentum contributes to the player's upon pickup.\n(X and Y scale respectively)
 entities.WarlockHelper/MomentumTheoCrystal.attributes.description.pickupPlayerMomentum=How much of the player's speed is retained upon pickup.\n(X and Y scale respectively)
 entities.WarlockHelper/MomentumTheoCrystal.attributes.description.pickupSpeed=Fixed speed added to the player's when picking the crystal up.\nFlipped horizontally if facing left.
+entities.WarlockHelper/MomentumTheoCrystal.attributes.description.playerBoost=Jumping while grabbing or throwing the Crystal will counteract its downwards momentum.
 entities.WarlockHelper/MomentumTheoCrystal.attributes.description.crystalBoost=Low downwards speed from the crystal is ignored to make vators more consistent.
 entities.WarlockHelper/MomentumTheoCrystal.attributes.description.hasTheo=When the Crystal is destroyed, the player dies. Also prevents spawning when entering a room while holding Theo and right transitions without holding something.

@@ -25,10 +25,12 @@ public class CustomHoldable() : Component(true,false)
     public Action onDie;
     public Func<bool> canDie;
 
-    public bool Held=false;
+    public bool Held;
     public Throw ThrowType;
     public Vector2 force;
 
+    public bool CancelJump;
+    
     public override void Update()
     {
         base.Update();
@@ -50,8 +52,7 @@ public class CustomHoldable() : Component(true,false)
         IL.Celeste.Holdable.Release += Holdable_releaseMod;
         pickupCoroutineHook =
             new ILHook(
-                typeof(Player).GetMethod(nameof(Player.PickupCoroutine), BindingFlags.NonPublic | BindingFlags.Instance)!
-                    .GetStateMachineTarget()!, Player_pickupCoroutineMod);
+                typeof(Player).GetMethod(nameof(Player.PickupCoroutine), BindingFlags.NonPublic | BindingFlags.Instance)!.GetStateMachineTarget()!, Player_pickupCoroutineMod);
     }
     internal static void Unload()
     {
@@ -72,26 +73,31 @@ public class CustomHoldable() : Component(true,false)
     }
     private static void customHoldablePickup(Holdable hold)
     {
-        if (hold.Entity.Get<CustomHoldable>() is { } ch)
+        if (hold.Entity.Get<CustomHoldable>() is { Held: false } ch)
         {
-            if (!ch.Held)
+            ch.Held = true;
+            Player player = hold.Holder;
+            ch.Holder = player;
+            ch.Dir = (float)player.Facing;
+            if (ch.pickupSpeed != null)
             {
-                ch.Held = true;
-                ch.Holder = hold.Holder;
-                ch.Dir = (float)ch.Holder.Facing;
-                hold.Holder.gliderBoostTimer -= 0.16f; //in Vanilla, gliderBoostTimer is checked after the pickup tween ends in PickupCoroutine. here, speed is set Before the animation starts.
-                if (ch.pickupSpeed != null)
-                {
-                    hold.Holder.Speed = ch.pickupSpeed();
-                }
+                player.Speed = ch.pickupSpeed();
+            }
+
+            if (ch.CancelJump && player.Speed.Y > player.varJumpSpeed)
+            {
+                //player.varJumpTimer = 0f;
+                player.varJumpSpeed = player.Speed.Y;
             }
         }
         
     }
     private static void Holdable_releaseMod(ILContext il)
     {
-        ILCursor cursor = new(il);
-        cursor.Index = -1;
+        ILCursor cursor = new(il)
+        {
+            Index = -1
+        };
         cursor.EmitLdarg0();
         cursor.EmitLdarg1();
         cursor.EmitDelegate(customHoldableRelease);
@@ -99,9 +105,9 @@ public class CustomHoldable() : Component(true,false)
 
     private static void customHoldableRelease(Holdable hold, Vector2 force)
     {
-        Entity entity = hold.Entity;
-        if (entity.Get<CustomHoldable>() is { Held: true } ch) //apparently clear pipes call release so like Only do this if its called by a player throwing it
+        if (hold.Entity.Get<CustomHoldable>() is { Held: true } ch) //apparently clear pipes call release so like Only do this if it's called by a player throwing it
         {
+            Player player = ch.Holder;
             ch.force = force; 
             if (force.X == 0f) //hopefully it works fine as is but if some modded entity doesn't work right with this it should be easy to fix
             {
@@ -116,7 +122,11 @@ public class CustomHoldable() : Component(true,false)
                 ch.ThrowType = Throw.Swat;
             }
 
-            ch.Dir = Math.Sign(force.X);
+            ch.Dir = Math.Sign(force.X); //cuz swat doesn't follow player facing
+            if (ch.Dir == 0)
+            {
+                ch.Dir = (float)player.Facing;
+            }
             //wait there exists Holdable.GetSpeed() and Holdable.SetSpeed()?? I don't need ISpeed anymore. Cool stuff!
             if (ch.throwSpeed != null)
             {
@@ -124,7 +134,12 @@ public class CustomHoldable() : Component(true,false)
             }
             if (ch.throwRecoil != null)
             {
-                ch.Holder.Speed = ch.throwRecoil();
+                player.Speed = ch.throwRecoil();
+            }
+            if (ch.CancelJump && player.Speed.Y > player.varJumpSpeed)
+            {
+                //player.varJumpTimer = 0f;
+                player.varJumpSpeed = player.Speed.Y;
             }
             ch.Held = false;
         }
@@ -134,22 +149,26 @@ public class CustomHoldable() : Component(true,false)
         ILCursor cursor = new(il);
         
         cursor.GotoNextBestFit(MoveType.AfterLabel,jellyStopTarget);
-        cursor.EmitLdloc1(); //i know your tricks now, IEnumerable. "this" is Local 1
+        cursor.EmitLdloc1();
         cursor.EmitDelegate(playerGetHasCustomPickupSpeed);
         ILLabel afterStop = cursor.DefineLabel();
         cursor.EmitBrtrue(afterStop);
         
         cursor.GotoNextBestFit(MoveType.After,jellyStopTarget);
         cursor.MarkLabel(afterStop);
-        
+
         cursor.GotoNextBestFit(MoveType.AfterLabel,jellyBoostTarget);
         cursor.EmitLdloc1();
         cursor.EmitDelegate(playerGetHasCustomPickupSpeed);
+        
         ILLabel afterBump = cursor.DefineLabel();
         cursor.EmitBrtrue(afterBump);
-        
+
         cursor.GotoNextBestFit(MoveType.After,jellyBumpEndTarget);
         cursor.MarkLabel(afterBump);
+        
+        //cursor.GotoPrev(MoveType.After, i => i.MatchLdfld("Celeste.Player+<PickupCoroutine>d__472","<oldSpeed>5__2"));
+        //cursor.emitLog<Vector2>();
     }
     private static void Player_throwMod(ILContext il)
     {
@@ -177,19 +196,6 @@ public class CustomHoldable() : Component(true,false)
             instr => instr.MatchAdd(),
             instr => instr.MatchStindR4(),
         ],
-        throwBranchConditionTarget =
-        [
-            instr => instr.MatchLdsfld(typeof(Input), nameof(Input.MoveY)),
-            instr => instr.MatchLdfld<VirtualIntegerAxis>(nameof(VirtualIntegerAxis.Value)),
-            instr => instr.MatchLdcI4(1),
-            instr => instr.MatchBneUn(out _)
-        ],
-        holdingCheckTarget =
-        [
-            instr => instr.MatchLdarg0(),
-            instr => instr.MatchCallvirt<Player>(Util.getter(nameof(Player.Holding))),
-            instr => instr.MatchBrfalse(out _)
-        ],
         jellyStopTarget =
         [
             instr => instr.MatchLdloc1(),
@@ -206,7 +212,7 @@ public class CustomHoldable() : Component(true,false)
             instr => instr.MatchLdloc1(),
             instr => instr.MatchLdfld<Player>(nameof(Player.gliderBoostTimer)),
             instr => instr.MatchLdcR4(0f),
-            instr => instr.MatchBleUn(out _)
+            instr => instr.OpCode == OpCodes.Ble_Un_S
         ],
         jellyBumpEndTarget =
         [

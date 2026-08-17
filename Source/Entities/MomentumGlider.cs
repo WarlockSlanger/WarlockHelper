@@ -1,14 +1,17 @@
+using System.Runtime.CompilerServices;
 using Celeste.Mod.Entities;
+using Celeste.Mod.GravityHelper;
 using Microsoft.Xna.Framework;
 using Monocle;
 using Celeste.Mod.WarlockHelper.Components;
+
+using Celeste.Mod.GravityHelper.Components;
 
 namespace Celeste.Mod.WarlockHelper.Entities;
 
 [CustomEntity("WarlockHelper/MomentumGlider")]
 public class MomentumGlider : CustomGlider
 {
-    //Do I need this much Customizability? It can't hurt much but... Oh well I already started just Finish it.
     public Vector2 ThrowSpeed, ThrowRecoil,
         DropSpeed, DropRecoil,
         PickupBoost; //assuming right facing
@@ -37,10 +40,17 @@ public class MomentumGlider : CustomGlider
         DropGliderMass = data.Vector2Grouped("dropGliderMomentum", Vector2.Zero);
         PickupPlayerMass = data.Vector2Grouped("pickupPlayerMomentum", Vector2.One);
         PickupGliderMass = data.Vector2Grouped("pickupGliderMomentum", Vector2.One);
+
+        CHold.CancelJump = !PlayerBoost;
         
         Remove(sprite);
         Add(sprite = GFX.SpriteBank.Create("warlockHelper_momentumGlider"));
         Add(spriteOver = GFX.SpriteBank.Create("warlockHelper_chargeOverlay"));
+
+        if (WarlockHelperModule.Instance.gravityHelperLoaded)
+        {
+            GravityInit();
+        }
         
         CHold.throwSpeed = () =>
         {
@@ -64,7 +74,7 @@ public class MomentumGlider : CustomGlider
         };
         CHold.pickupSpeed = () =>
         {
-            Vector2 playerSpeed=PlayerBoost ? CHold.Holder.GliderBoost(true) : CHold.Holder.Speed; //ik this is confusing What else can i call it
+            Vector2 playerSpeed=PlayerBoost ? CHold.Holder.GliderBoost(true,true) : CHold.Holder.Speed; //ik this is confusing What else can i call it
 
             Vector2 gliderSpeed = Speed;
             if (ChargedSpeed(gliderSpeed))
@@ -83,6 +93,15 @@ public class MomentumGlider : CustomGlider
         //Hold.OnPickup = CustomOnPickup;
         //Hold.OnRelease = CustomOnRelease;
     }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private void GravityInit()
+    {
+        this.GetSafe<GravityComponent>().UpdateVisuals = args => spritesScaleY = args.NewValue == GravityType.Inverted ? -1f : 1f;
+        //maybe theres a simpler way to have the sprite copy the other's scale when rendering but idk
+    }
+
+    private float spritesScaleY=1f;
     
     public override void Update()
     {
@@ -91,14 +110,16 @@ public class MomentumGlider : CustomGlider
         {
             return;
         }
+        spriteOver.Scale = sprite.Scale;
+        spriteOver.Scale.Y *= spritesScaleY;
+        spriteOver.Rotation = sprite.Rotation;
+        
         bool charged = ChargedSpeed(ChargeSpeed);
         if (charged && !spriteOver.Animating)
         {
             spriteOver.Play("on");
         }
 
-        spriteOver.Scale = sprite.Scale;
-        spriteOver.Rotation = spriteOver.Rotation;
         if (Scene.OnInterval(charged ? 0.05f : 0.1f))
         {
             float num = Calc.Random.NextAngle();

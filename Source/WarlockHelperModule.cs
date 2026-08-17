@@ -39,8 +39,17 @@ public class WarlockHelperModule : EverestModule
 #endif
     }
 
+    private EverestModuleMetadata gravityHelper = new()
+    {
+        Name = "GravityHelper",
+        Version = new Version(1, 2, 28)
+    };
+
+    internal bool gravityHelperLoaded;
+
     public override void Load()
     {
+        gravityHelperLoaded = Everest.Loader.DependencyLoaded(gravityHelper);
         IL.Celeste.Player.CallDashEvents += Player_callDashEventsMod;
         IL.Celeste.Player.DashBegin += Player_dashBeginHook;
         IL.Celeste.Player.RedDashBegin += Player_redDashBeginHook;
@@ -222,7 +231,7 @@ public class WarlockHelperModule : EverestModule
 
         cursor.GotoNext(MoveType.After, instr => instr.MatchCallvirt<Player>("get_CanDash"));
 
-        ILLabel NoDash = (ILLabel)cursor.Next.Operand;
+        ILLabel NoDash = (ILLabel)cursor.Next!.Operand;
         cursor.Index++;
 
         cursor.EmitLdarg0();

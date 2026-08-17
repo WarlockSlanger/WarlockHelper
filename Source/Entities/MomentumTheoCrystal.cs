@@ -16,12 +16,13 @@ public class MomentumTheoCrystal : CustomTheoCrystal
         DropPlayerMass, DropCrystalMass,
         PickupPlayerMass, PickupCrystalMass;
     
-    public bool CrystalBoost;
+    public bool PlayerBoost,CrystalBoost;
     
     public MomentumTheoCrystal(EntityData data, Vector2 offset)
         : base(data, offset)
     {
-        Theo = data.Bool("hasTheo", false);
+        Theo = data.Bool("hasTheo");
+        PlayerBoost = data.Bool("playerBoost");
         CrystalBoost = data.Bool("crystalBoost", true);
         ThrowSpeed = data.Vector2Grouped("throwCrystalSpeed", new Vector2(200f,-80f));
         ThrowRecoil = data.Vector2Grouped("throwPlayerSpeed", new Vector2(-80f,0f));
@@ -34,6 +35,8 @@ public class MomentumTheoCrystal : CustomTheoCrystal
         DropCrystalMass = data.Vector2Grouped("dropCrystalMomentum", Vector2.Zero);
         PickupPlayerMass = data.Vector2Grouped("pickupPlayerMomentum", Vector2.One);
         PickupCrystalMass = data.Vector2Grouped("pickupCrystalMomentum", Vector2.One);
+        
+        CHold.CancelJump = !PlayerBoost;
         
         Remove(sprite);
         Add(sprite = GFX.SpriteBank.Create(Theo ? "warlockHelper_momentumTheo" : "warlockHelper_momentumCrystal"));

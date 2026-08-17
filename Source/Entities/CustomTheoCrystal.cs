@@ -10,7 +10,7 @@ namespace Celeste.Mod.WarlockHelper.Entities;
 
 public class CustomTheoCrystal :  TheoCrystal
 {
-    private bool dieNormally = false;
+    private bool dieNormally;
     public CustomHoldable CHold;
     
     public bool Theo; //Kills the player when dying, must be carried through the level and doesn't spawn when carried in from elsewhere

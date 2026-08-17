@@ -13,9 +13,9 @@ public class DashDirTrigger : Trigger
 {
     public class PlayerVectorFuncData
     {
-        public Util.Matrix2x2 matrix=null;
-        public Vector2[] dirs=null;
-        public Vector2? neutralLeft = null, neutralRight = null;
+        public Util.Matrix2x2 matrix;
+        public Vector2[] dirs;
+        public Vector2? neutralLeft, neutralRight;
     }
 
     private PlayerVectorFuncData pvf;
