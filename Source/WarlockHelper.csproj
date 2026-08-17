@@ -31,6 +31,10 @@
     <ItemGroup>
       <Folder Include="Interfaces\" />
     </ItemGroup>
+	
+	<ItemGroup>
+	  <Reference Include="../../Cache/GravityHelper.GravityHelper.dll" Private="false" /> <!--Cache? I'll trust their word for it-->
+	</ItemGroup>
 
     <Target Name="CopyFiles" AfterTargets="Build" Inputs="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).pdb" Outputs="..\bin\$(AssemblyName).dll;..\bin\$(AssemblyName).pdb">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="..\bin" />

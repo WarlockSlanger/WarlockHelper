@@ -2,8 +2,6 @@ local mods = require("mods")
 local wsUtils = mods.requireFromPlugin("libraries.utils")
 local ftype = mods.requireFromPlugin("libraries.fieldTypes")
 
-local spriteSize = 22
-
 local boosterBumper = {}
 boosterBumper.name = "WarlockHelper/BoosterBumper"
 function boosterBumper.depth(room, entity)
@@ -21,7 +19,7 @@ function boosterBumper.texture(room, entity)
 end
 
 function boosterBumper.selection(room, entity) 
-	return wsUtils.selectRect(entity,spriteSize);
+	return wsUtils.selectRect(entity,-11,-11,22,22);
 end
 
 boosterBumper.fieldInformation = {

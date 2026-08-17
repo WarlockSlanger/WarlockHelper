@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
+using System.Diagnostics;
 using Celeste.Mod.WarlockHelper.Components;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -148,17 +149,22 @@ public static class Extensions
             ddr.SetDefault(dashdirfunc);
         }
 
-        public Vector2 GliderBoost(bool sideEffects=false)
+        public Vector2 GliderBoost(bool preTween=true, bool sideEffects=false)
         {
             Vector2 ans = player.Speed;
             ans.Y = Math.Min(ans.Y, 0f);
-            if (player.gliderBoostTimer > 0f && player.gliderBoostDir.Y < 0f)
+            float timer = player.gliderBoostTimer;
+            if (preTween)
+            {
+                timer -= 0.16f;
+            }
+            if (timer > 0f && player.gliderBoostDir.Y < 0f)
             {
                 if (sideEffects)
                 {
                     Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
+                    player.gliderBoostTimer = 0f;
                 }
-                player.gliderBoostTimer = 0f;
                 ans.Y = Math.Min(ans.Y, -240f * Math.Abs(player.gliderBoostDir.Y));
             }
             else if (ans.Y < 0f)
@@ -182,6 +188,23 @@ public static class Extensions
             {
                 cursor.EmitLdarg0();
             }
+        }
+
+        internal void emitDebug(string str)
+        {
+            cursor.EmitLdstr(str);
+            cursor.EmitDelegate(Debug.ILLog<string>);
+        }
+
+        internal void emitLog<T>()
+        {
+            cursor.EmitDup();
+            cursor.EmitDelegate(Debug.ILLog<T>);
+        }
+
+        internal void emitBreak()
+        {
+            cursor.EmitDelegate(Debugger.Break);
         }
     }
 

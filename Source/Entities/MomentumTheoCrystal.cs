@@ -21,7 +21,7 @@ public class MomentumTheoCrystal : CustomTheoCrystal
     public MomentumTheoCrystal(EntityData data, Vector2 offset)
         : base(data, offset)
     {
-        Theo = data.Bool("hasTheo", false);
+        Theo = data.Bool("hasTheo");
         CrystalBoost = data.Bool("crystalBoost", true);
         ThrowSpeed = data.Vector2Grouped("throwCrystalSpeed", new Vector2(200f,-80f));
         ThrowRecoil = data.Vector2Grouped("throwPlayerSpeed", new Vector2(-80f,0f));

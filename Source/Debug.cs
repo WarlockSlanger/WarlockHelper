@@ -4,7 +4,7 @@ using Monocle;
 
 namespace Celeste.Mod.WarlockHelper;
 
-internal static class Debug
+public static class Debug
 {
     internal static void Log(String message = null, LogLevel logLevel = LogLevel.Verbose, String specifier = null)
     {
@@ -18,19 +18,16 @@ internal static class Debug
         Logger.Log(logLevel,tag,message);
     }
 
-    internal static void DLog(String message)
+    internal static void ILLog<T>(T val)
     {
-        Log($"DEBUGLOG WSH {message}");
+        Log($"DEBUGLOG WSH {val?.ToString() ?? "null"}");
     }
-    internal static void DILog(int val)
-    {
-        DLog(val.ToString());
-    }
-    public static componentIds ComponentIds = new(); 
+
+    public static readonly componentIds ComponentIds = new(); 
     public class componentIds
     {
-        private Dictionary<Component, int> _ids = new();
-        private Dictionary<int, Component> _components = new();
+        private readonly Dictionary<Component, int> _ids = new();
+        private readonly Dictionary<int, Component> _components = new();
         private static int _currentId;
 
         public int? this[Component i]

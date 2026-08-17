@@ -70,14 +70,14 @@ public class BoosterBumper : Entity
     public BoosterBumper(EntityData data, Vector2 offset)
         : base(data.Position+offset)
     {
-        Red = data.Bool("red",false);
-        Wobbling = data.Bool("wobbling",false);
-        SnapDirection = data.Bool("snapDirection",false);
+        Red = data.Bool("red");
+        Wobbling = data.Bool("wobbling");
+        SnapDirection = data.Bool("snapDirection");
         SilentDash = data.Bool("silentDash", true);
         DashCooldown = data.Bool("dashCooldown", true);
-        DashInterrupt = data.Bool("dashInterrupt", false);
-        DashSuper = data.Bool("dashSuper", false);
-        SnapPosition = data.Bool("snapPosition", false);
+        DashInterrupt = data.Bool("dashInterrupt");
+        DashSuper = data.Bool("dashSuper");
+        SnapPosition = data.Bool("snapPosition");
 
         Depth = data.Int("Depth",Depths.Below);
 

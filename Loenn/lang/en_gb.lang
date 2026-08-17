@@ -43,7 +43,7 @@ entities.WarlockHelper/MomentumGlider.attributes.description.dropPlayerSpeed=As 
 entities.WarlockHelper/MomentumGlider.attributes.description.pickupGliderMomentum=How much the glider's momentum contributes to the player's upon pickup.\n(X and Y scale respectively)
 entities.WarlockHelper/MomentumGlider.attributes.description.pickupPlayerMomentum=How much of the player's speed is retained upon pickup.\n(X and Y scale respectively)
 entities.WarlockHelper/MomentumGlider.attributes.description.pickupSpeed=Fixed speed added to the player's when picking the jelly up.\nFlipped horizontally if facing left.
-entities.WarlockHelper/MomentumGlider.attributes.description.playerBoost=Dashes, hypers, etc. increase upwards speed upon pickup.
+entities.WarlockHelper/MomentumGlider.attributes.description.playerBoost=Player downwards speed is nullified.\nUpwards boost if moving up, dashing, hypering etc. upon pickup.\n(Applied before rescaling by pickupPlayerMomentum)\nIf disabled, jumps are also weakened if the glider is supposed to send the player downwards
 entities.WarlockHelper/MomentumGlider.attributes.description.gliderBoost=Low downwards speed from the jelly is ignored to make vators more consistent.
 
 # Momentum Theo
