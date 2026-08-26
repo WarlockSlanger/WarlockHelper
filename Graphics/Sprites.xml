@@ -39,4 +39,11 @@
       <Anim id="hit" path="idleRed" frames="34-42" delay="0.06" goto="off"/>
       <Loop id="off" path="idleRed" frames="42" delay="0.06"/>
   </warlockHelper_boosterBumper_red>
+  <warlockHelper_boosterBumper_super path="objects/WarlockHelper/boosterBumper/" start="idle">
+      <Center/>
+      <Anim id="on" path="idleSuper" frames="42-50" delay="0.06" goto="idle"/>
+      <Loop id="idle" path="idleSuper" frames="0-33" delay="0.06"/>
+      <Anim id="hit" path="idleSuper" frames="34-42" delay="0.06" goto="off"/>
+      <Loop id="off" path="idleSuper" frames="42" delay="0.06"/>
+  </warlockHelper_boosterBumper_super>
 </Sprites>

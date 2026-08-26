@@ -94,7 +94,7 @@ public class BoosterBumper : Entity
         {
             Add(sine = new SineWave(Bumper.SineCycleFreq, 0f).Randomize());
         }
-        Add(Sprite = GFX.SpriteBank.Create(Red ? "warlockHelper_boosterBumper_red" : "warlockHelper_boosterBumper"));
+        Add(Sprite = GFX.SpriteBank.Create("warlockHelper_boosterBumper" + (Red ? "_red" : DashSuper ? "_super" : "")));
         Add(light = new VertexLight(Color.MediumVioletRed, 1f, 16, 32));
         Add(bloom = new BloomPoint(0.5f, 16f));
         

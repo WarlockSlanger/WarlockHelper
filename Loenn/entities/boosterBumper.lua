@@ -11,9 +11,11 @@ end
 boosterBumper.nodeLineRenderType = "line"
 
 function boosterBumper.texture(room, entity)
-	local red = entity.red
-	if red then
+	if entity.red then
 		return "objects/WarlockHelper/boosterBumper/idleRed30"
+	end
+	if entity.dashSuper then
+		return "objects/WarlockHelper/boosterBumper/idleSuper30"
 	end
 	return "objects/WarlockHelper/boosterBumper/idle30"
 end
@@ -28,7 +30,7 @@ boosterBumper.fieldInformation = {
 }
 
 boosterBumper.nodeLimits = {0, 1}
---[[boosterBumper.placements = {
+boosterBumper.placements = {
 	{
 		name = "normal",
 		data = {
@@ -63,6 +65,23 @@ boosterBumper.nodeLimits = {0, 1}
 			moveCycleTime = 1.8181819,
 		}
 	},
-}]]
+	{
+		name = "super",
+		data = {
+			Depth=2000,
+			snapDirection = false,
+			red = false,
+			wobbling = false,
+			silentDash = true,
+			dashCooldown = true,
+			dashInterrupt = false,
+			dashSuper = true,
+			snapPosition = false,
+			direction = ftype.matrix.default,
+			respawnTime = 0.6,
+			moveCycleTime = 1.8181819,
+		}
+	},
+}
 
 return boosterBumper
