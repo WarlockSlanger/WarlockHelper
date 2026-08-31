@@ -6,6 +6,7 @@ using Monocle;
 using Celeste.Mod.WarlockHelper.Components;
 
 using Celeste.Mod.GravityHelper.Components;
+using Celeste.Mod.WarlockHelper.Imports;
 
 namespace Celeste.Mod.WarlockHelper.Entities;
 
@@ -47,11 +48,6 @@ public class MomentumGlider : CustomGlider
         Add(sprite = GFX.SpriteBank.Create("warlockHelper_momentumGlider"));
         Add(spriteOver = GFX.SpriteBank.Create("warlockHelper_chargeOverlay"));
 
-        if (WarlockHelperModule.Instance.gravityHelperLoaded)
-        {
-            GravityInit();
-        }
-        
         CHold.throwSpeed = () =>
         {
             Vector2 mass;
@@ -94,15 +90,11 @@ public class MomentumGlider : CustomGlider
         //Hold.OnRelease = CustomOnRelease;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private void GravityInit()
+    private float SpriteScaleY
     {
-        this.GetSafe<GravityComponent>().UpdateVisuals = args => spritesScaleY = args.NewValue == GravityType.Inverted ? -1f : 1f;
-        //maybe theres a simpler way to have the sprite copy the other's scale when rendering but idk
+        get => GravityHelperImports.IsActorInverted?.Invoke(this) ?? false ? -1f : 1f;
     }
 
-    private float spritesScaleY=1f;
-    
     public override void Update()
     {
         base.Update();
@@ -111,7 +103,7 @@ public class MomentumGlider : CustomGlider
             return;
         }
         spriteOver.Scale = sprite.Scale;
-        spriteOver.Scale.Y *= spritesScaleY;
+        spriteOver.Scale.Y *= SpriteScaleY;
         spriteOver.Rotation = sprite.Rotation;
         
         bool charged = ChargedSpeed(ChargeSpeed);

@@ -152,13 +152,13 @@ public class BoosterBumper : Entity
 
         if (SnapPosition)
         {
-            Vector2 pos = Position+ dir.SafeNormalize() * RadBumper- player.Collider.Center;
+            Vector2 pos = Position+ dir.SafeNormalize() * (RadBumper+Math.Min(player.Collider.Height,player.Collider.Width)/2f)- player.Collider.Center;
             player.MoveToX(pos.X);
             player.MoveToY(pos.Y);
         }
         dir = DashDirFunc(dir);
         Celeste.Freeze(0.1f);
-        player.ForceDash(dashdir: dir, super: DashSuper, red: Red,silent: SilentDash,noCooldown: !DashCooldown,interrupt: DashInterrupt);
+        player.ForceDash(dashdir: dir, super: DashSuper, red: Red,silent: SilentDash,noCooldown: !DashCooldown,interrupt: DashInterrupt,demo:player.Ducking);
         if(!player.Inventory.NoRefills)
 
         {

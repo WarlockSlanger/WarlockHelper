@@ -5,7 +5,9 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System.Reflection;
 using Celeste.Mod.WarlockHelper.Entities;
+using Celeste.Mod.WarlockHelper.Imports;
 using Microsoft.Xna.Framework;
+using MonoMod.ModInterop;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 
@@ -39,17 +41,9 @@ public class WarlockHelperModule : EverestModule
 #endif
     }
 
-    private EverestModuleMetadata gravityHelper = new()
-    {
-        Name = "GravityHelper",
-        Version = new Version(1, 2, 28)
-    };
-
-    internal bool gravityHelperLoaded;
-
     public override void Load()
     {
-        gravityHelperLoaded = Everest.Loader.DependencyLoaded(gravityHelper);
+        typeof(GravityHelperImports).ModInterop();
         IL.Celeste.Player.CallDashEvents += Player_callDashEventsMod;
         IL.Celeste.Player.DashBegin += Player_dashBeginHook;
         IL.Celeste.Player.RedDashBegin += Player_redDashBeginHook;

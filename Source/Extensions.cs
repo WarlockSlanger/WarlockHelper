@@ -126,7 +126,7 @@ public static class Extensions
 
     extension(Player player)
     {
-        public void ForceDash(Vector2? dashdir = null,bool super=false, bool red = false, bool silent= true, bool noCooldown=false, bool interrupt = false)
+        public void ForceDash(Vector2? dashdir = null,bool demo=false, bool super=false, bool red = false, bool silent= true, bool noCooldown=false, bool interrupt = false)
         {
             var dmod = player.GetSafe<DashModifier>();
             player.SetNextDashDir(dashdir);
@@ -135,6 +135,7 @@ public static class Extensions
             dmod.changeInterrupt = red^interrupt;
             dmod.super = super;
             player.StateMachine.ForceState(red ? Player.StRedDash : Player.StDash);
+            player.Ducking = demo;
         }
 
         public void SetNextDashDir(Vector2? dashdir = null)
